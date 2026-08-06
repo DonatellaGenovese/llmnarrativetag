@@ -1,0 +1,54 @@
+dataset: TopLandscape
+R0: 0.8
+softdrop:
+  z_cut: 0.1
+  beta: 0.0
+nsubjettiness:
+  beta: 1.0
+  axes: OnePass_KT
+ecf:
+  beta: 1.0
+  truncate_C3: 50
+  truncate_N3: 40
+
+# Feature columns written to the feature table (Tier A + B)
+observables:
+  - m
+  - m_SD
+  - tau21
+  - tau32
+  - C2_double_b1
+  - D2_double_b1
+  - C3_double_b1
+  - N3_b1
+  - pT
+  - n_const
+
+# ParT teacher columns expected in the prediction parquet
+targets:
+  z_top: logit_jet_isTop
+  z_qcd: logit_jet_isQCD
+  t: logit_diff
+  s: score_jet_isTop
+  label: label
+
+# Weaver class index 0 = top, 1 = QCD. Used by label-trained classifiers.
+positive_class_index: 0
+
+# Defaults (override on CLI). Official protocol uses file splits, not random fracs.
+prototype:
+  max_jets: null
+  seed: 42
+  # legacy random-split fracs (only if a single-file prototype is used)
+  train_frac: 0.70
+  val_frac: 0.15
+
+# Surrogate fitting
+fit:
+  target_clip_percentiles: [0.5, 99.5]
+  ridge_log_features: [m, m_SD, pT]
+  ratio_clip_percentiles: [0.1, 99.9]
+  ebm_interactions: 0
+  ebm_max_bins: 256
+  ebm_learning_rate: 0.01
+  ebm_max_rounds: 5000

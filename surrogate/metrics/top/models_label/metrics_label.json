@@ -1,0 +1,112 @@
+{
+  "target": "label",
+  "positive_class_index": 0,
+  "n": {
+    "train": 1210999,
+    "val": 402999,
+    "test": 403999
+  },
+  "paths": {
+    "train": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_train.parquet",
+    "val": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_val.parquet",
+    "test": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_test.parquet"
+  },
+  "logistic": {
+    "train": {
+      "acc": 0.9106390674145891,
+      "auc": 0.9651193514269845
+    },
+    "val": {
+      "acc": 0.9099575929468807,
+      "auc": 0.9645564863451329
+    },
+    "test": {
+      "acc": 0.9108141356785536,
+      "auc": 0.9651256097549596
+    }
+  },
+  "ebm": {
+    "train": {
+      "acc": 0.9222716121152866,
+      "auc": 0.9767059737558721
+    },
+    "val": {
+      "acc": 0.9212479435432842,
+      "auc": 0.9761401042539437
+    },
+    "test": {
+      "acc": 0.922299312622061,
+      "auc": 0.9767486232784612
+    }
+  },
+  "gbdt": {
+    "train": {
+      "acc": 0.9323285981243585,
+      "auc": 0.9822204890900078
+    },
+    "val": {
+      "acc": 0.9275705398772701,
+      "auc": 0.979588115677342
+    },
+    "test": {
+      "acc": 0.9281483370008342,
+      "auc": 0.9802092549039101
+    }
+  },
+  "part": {
+    "train": {
+      "acc": 0.9353608054176759,
+      "auc": 0.9831700327309726
+    },
+    "val": {
+      "acc": 0.9340618711212683,
+      "auc": 0.982539901522222
+    },
+    "test": {
+      "acc": 0.9353339983514811,
+      "auc": 0.9830638461693373
+    }
+  },
+  "ebm_importances": [
+    [
+      "m",
+      2.1636575119287005
+    ],
+    [
+      "C2_double_b1",
+      1.4208769935895125
+    ],
+    [
+      "D2_double_b1",
+      1.2078210407282444
+    ],
+    [
+      "n_const",
+      0.9032820363815995
+    ],
+    [
+      "N3_b1",
+      0.8187211901907107
+    ],
+    [
+      "m_SD",
+      0.5957796975183215
+    ],
+    [
+      "tau32",
+      0.396345467822737
+    ],
+    [
+      "C3_double_b1",
+      0.19506345198037434
+    ],
+    [
+      "pT",
+      0.16911247007938715
+    ],
+    [
+      "tau21",
+      0.14532461668817756
+    ]
+  ]
+}

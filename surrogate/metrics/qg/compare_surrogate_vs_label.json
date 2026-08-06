@@ -1,0 +1,55 @@
+{
+  "split": "test",
+  "part_baseline": {
+    "acc": 0.8389883898838988,
+    "auc": 0.9115450609012181
+  },
+  "models": {
+    "ridge": {
+      "imitate_part": {
+        "acc": 0.7914779147791478,
+        "auc": 0.8675765744314886
+      },
+      "train_on_label": {
+        "acc": 0.7925479254792548,
+        "auc": 0.8688329637592752
+      },
+      "delta_label_minus_imitate": {
+        "acc": 0.001070010700107038,
+        "auc": 0.0012563893277866
+      }
+    },
+    "ebm": {
+      "imitate_part": {
+        "acc": 0.7942479424794248,
+        "auc": 0.8746559655193105
+      },
+      "train_on_label": {
+        "acc": 0.7973779737797378,
+        "auc": 0.8759275929518591
+      },
+      "delta_label_minus_imitate": {
+        "acc": 0.0031300313003130853,
+        "auc": 0.0012716274325486054
+      }
+    },
+    "gbdt": {
+      "imitate_part": {
+        "acc": 0.8056030560305603,
+        "auc": 0.8836737094741896
+      },
+      "train_on_label": {
+        "acc": 0.8056680566805668,
+        "auc": 0.8835167328346567
+      },
+      "delta_label_minus_imitate": {
+        "acc": 6.500065000658584e-05,
+        "auc": -0.00015697663953284646
+      }
+    }
+  },
+  "sources": {
+    "surrogate_classifier_metrics": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/qg/models/classifier_metrics.json",
+    "label_metrics": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/qg/models_label/metrics_label.json"
+  }
+}

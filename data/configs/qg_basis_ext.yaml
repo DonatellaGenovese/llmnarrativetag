@@ -1,0 +1,52 @@
+dataset: QuarkGluon
+# Baseline 14 + extension block (jet charge, PID fractions, z_max, C_1 β=1)
+
+observables:
+  # original Vent-style + diagnostics
+  - w_pf
+  - pTD
+  - C_02
+  - lambda_LHA
+  - lambda_21
+  - r_lambda
+  - S_frag
+  - ellipticity
+  - mass
+  - pT
+  - n_pf
+  - n_Q
+  - S_PID
+  - E_Q
+  # extension under test
+  - Q_05
+  - f_ch
+  - f_gamma
+  - f_nh
+  - z_max
+  - C_1_b1
+
+targets:
+  z_q: logit_jet_isQ
+  z_g: logit_jet_isG
+  t: logit_diff
+  s: score_jet_isQ
+  label: label
+
+positive_class_index: 0
+
+prototype:
+  seed: 42
+
+fit:
+  target_clip_percentiles: [0.5, 99.5]
+  ridge_log_features: [mass, pT, n_pf, n_Q]
+  ratio_clip_percentiles: [0.1, 99.9]
+  ebm_interactions: 0
+  ebm_max_bins: 256
+  ebm_learning_rate: 0.01
+  ebm_max_rounds: 5000
+
+train_val_split: 0.8889
+
+# Official additive run: surrogate/outputs/qg_ext/
+# With pairwise interactions (see qg_basis_ext_int10.yaml): surrogate/outputs/qg_ext_int10/

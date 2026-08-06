@@ -1,0 +1,38 @@
+dataset: QuarkGluon
+observables:
+- n_pf
+- n_Q
+- r_lambda
+- pTD
+- C_02
+- S_frag
+- S_PID
+- E_Q
+- pT
+- mass
+targets:
+  z_q: logit_jet_isQ
+  z_g: logit_jet_isG
+  t: logit_diff
+  s: score_jet_isQ
+  label: label
+positive_class_index: 0
+prototype:
+  seed: 42
+fit:
+  target_clip_percentiles:
+  - 0.5
+  - 99.5
+  ridge_log_features:
+  - mass
+  - pT
+  - n_pf
+  - n_Q
+  ratio_clip_percentiles:
+  - 0.1
+  - 99.9
+  ebm_interactions: 0
+  ebm_max_bins: 256
+  ebm_learning_rate: 0.01
+  ebm_max_rounds: 5000
+train_val_split: 0.8889
