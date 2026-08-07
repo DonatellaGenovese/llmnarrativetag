@@ -1,0 +1,1 @@
+../../surrogate/scripts/run_prototype_top.sh
