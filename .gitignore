@@ -7,6 +7,8 @@ __pycache__/
 .venv/
 venv/
 env/
+particle_transformer/env.sh
+particle_transformer/predict_output/
 
 # Large / regenerable artifacts — not tracked in this repo
 *.parquet

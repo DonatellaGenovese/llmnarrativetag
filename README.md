@@ -16,29 +16,36 @@ live in [`docs/paper.md`](docs/paper.md).
 ## Structure
 
 ```
-docs/           Project write-up (docs/paper.md) and future notes
+docs/                 Project write-up (docs/paper.md) and future notes
 data/
-  observables/  Observable definitions and feature-building code (Part 1)
-  configs/      Observable-basis configs + weaver dataloader configs
-surrogate/      GAM/EBM surrogate training, evaluation, audit (Part 2)
-  scripts/      Shell entry points for each surrogate run
-  metrics/      Lightweight JSON/TXT metrics from past runs (no model binaries)
-narrative/      LLM narrative generation (Part 3) — scaffold, work in progress
-evaluation/     Narrative evaluation against the surrogate (Part 4) — scaffold
-scripts/        Teacher (ParT) inference / logit-dumping utilities
+  observables/        Observable definitions and feature-building code (Part 1)
+  configs/            Observable-basis configs + weaver dataloader configs
+surrogate/            GAM/EBM surrogate training, evaluation, audit (Part 2)
+  scripts/            Shell entry points for each surrogate run
+  metrics/            Lightweight JSON/TXT metrics from past runs (no model binaries)
+narrative/            LLM narrative generation (Part 3) — scaffold, work in progress
+evaluation/           Narrative evaluation against the surrogate (Part 4) — scaffold
+scripts/              Teacher (ParT) inference / logit-dumping utilities
+particle_transformer/ Vendored ParT training toolkit + teacher logits (see below)
 ```
 
 ## Relationship to the ParT codebase
 
 The ParticleNet / Particle Transformer teacher models are trained with the
 upstream [jet-universe/particle_transformer](https://github.com/jet-universe/particle_transformer)
-toolkit (network definitions, weaver dataloaders, training loop). That
-toolkit, the raw datasets (TopLandscape, QuarkGluon, JetClass), and the
-trained model checkpoints are not part of this repository — they are large
-binary artifacts, reproducible from the upstream repo, and orthogonal to the
-explanation work done here. This repo contains only the original
-surrogate-distillation and (upcoming) LLM-narrative code built on top of that
-teacher's output.
+toolkit (network definitions, weaver dataloaders, training loop). This repo
+vendors the parts of that toolkit needed to reproduce training/inference —
+`particle_transformer/` (network defs, dataloader, weaver configs, train
+scripts) — copied from the upstream repo at commit `2925bdb`. See
+[`particle_transformer/README.md`](particle_transformer/README.md) for what
+is/isn't included and why.
+
+Not part of this repository, in any form: the raw datasets themselves
+(TopLandscape, QuarkGluon, JetClass), the trained model checkpoints
+(`.pt`/`.pth`), and the ParT teacher logits already computed on
+TopLandscape/QuarkGluon (`t = logit_diff`, the values the surrogate is fit
+to reproduce) — these are large binary artifacts, kept local for now and
+destined for external hosting (TBD) rather than the git repo.
 
 ## Status
 
