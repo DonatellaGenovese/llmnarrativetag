@@ -23,6 +23,12 @@ runs/
 logs/
 training/
 surrogate/outputs/
+# Narrative runs: one JSONL per model per prompt version, plus derived review
+# text and logs. Regenerable, and they grow with every sweep. The jet sample is
+# the exception: it defines which jets a run covered, so a result is not
+# reproducible without it.
+narrative/outputs/
+!narrative/outputs/top/narratives/run100_jets.json
 
 # OS
 .DS_Store

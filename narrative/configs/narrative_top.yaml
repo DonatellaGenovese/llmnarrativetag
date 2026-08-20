@@ -1,0 +1,92 @@
+# Part 3 narrative pipeline — TopLandscape.
+dataset: TopLandscape
+
+# Inputs produced by Part 2 (surrogate/).
+inputs:
+  features: surrogate/outputs/top/features/features_test.parquet
+  model: surrogate/outputs/top/models/ebm.joblib
+
+artefact:
+  # schema_version is derived from include_pct, not set here: 1 = no rarity
+  # fields, 2 = `pct` and `rarity` per observable.
+  #
+  # Observables reported per jet, ranked by |phi|. null = all of them.
+  top_k: null
+  # Position and rarity of each value within the other class.
+  include_pct: true
+  round:
+    value: 2
+    phi: 2
+    score: 2
+    # Two decimals. At integer precision 16.3% of (jet, observable) pairs land
+    # on exactly 0 or 100; at one decimal 6.4% of rarities were still a literal
+    # 0.0, which reads as "no jet lies further out" and is false.
+    pct: 2
+
+# Abstention gate, calibrated on the test set (see narrative/README.md).
+# |r| = |t_clip - g_hat|, the part of the decision the basis does not express.
+abstention:
+  full_threshold: 1.0      # |r| < 1.0  -> narrate normally      (69.5% coverage)
+  caveat_threshold: 2.0    # 1.0 <= |r| < 2.0 -> narrate with adequacy caveat
+                           # |r| >= 2.0 -> abstain, no narrative (7.1% of jets)
+
+glossary:
+  path: narrative/configs/glossary_top.yaml
+  # Refuse to build prompts from glossary entries still marked `draft`.
+  # The physical readings go into the narrative, so they need sign-off.
+  require_reviewed: true
+
+prompt:
+  path: narrative/prompts/prompt_top.yaml
+
+llm:
+  # Backend selects both the protocol and the credential:
+  #
+  #   aistudio   google-genai, api key           GOOGLE_API_KEY
+  #   vertex     google-genai, ADC               gcloud application-default login
+  #   deepseek   OpenAI-compatible               DEEPSEEK_API_KEY
+  #   groq       OpenAI-compatible               GROQ_API_KEY
+  #   ollama     OpenAI-compatible               OLLAMA_API_KEY
+  #
+  # `backend` and `model` are both overridable from the command line
+  # (--backend, --model), which is how a sweep runs several providers against
+  # one config without editing it in between.
+  backend: vertex
+  # Environment wins over both, so a different project needs no edit here:
+  #   GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION
+  project: llm-narrative-jettag
+  # "global", not a region: the Gemini 3.x models are served only from the
+  # global endpoint and return 404 from every regional one (tested us-central1,
+  # us-east5, europe-west4). The 2.5 family works from both, so global is the
+  # one endpoint that reaches everything.
+  location: global
+  # Cheapest tier this project can actually reach: the 3.x models are listed
+  # under us-central1 but generateContent returns 404 for them here.
+  # Callable and verified: gemini-2.5-flash-lite, -flash, -pro.
+  # The verifier retries on failure, so a weak model trades cost against
+  # attempts: measure the pass rate before settling on this.
+  model: gemini-2.5-flash-lite
+  temperature: 0.0
+  seed: 42
+  # Thinking tokens are drawn from this same budget, so it has to cover both.
+  # Measured: a complete narrative runs ~1700-2000 output tokens, and
+  # gemini-2.5-flash spends ~3900 more on reasoning. At 2048 the reasoning
+  # models returned truncated narratives that failed verification for lack of
+  # room rather than for lack of ability.
+  max_output_tokens: 8192
+  # 0 disables reasoning; null leaves the model's default in place.
+  # gemini-2.5-flash-lite does not reason at all, gemini-2.5-flash obeys, and
+  # gemini-2.5-pro rejects the field outright — the client records which of the
+  # three actually happened for every call.
+  thinking_budget: 0
+  max_attempts: 1
+  # Retries raise the temperature by this much per attempt. Advancing only the
+  # seed is not enough: measured on the first run, 4 seeds at temperature 0
+  # returned byte-identical text on 2 jets out of 5, so the loop re-failed
+  # identically. The SDK only promises "best effort" determinism from a seed,
+  # and here it delivers rather more than that.
+  retry_temperature_step: 0.3
+
+outputs:
+  stats: narrative/outputs/top/reference_stats
+  narratives: narrative/outputs/top/narratives
