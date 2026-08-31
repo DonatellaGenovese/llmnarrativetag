@@ -94,16 +94,17 @@ def main() -> None:
     repo = Path(__file__).resolve().parents[1]
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--set", type=Path, default=repo / "evaluation/annotation_set")
+    p.add_argument("--set", type=Path, default=repo / "evaluation/annotation_set",
+                   help="The set as handed out; KEY.csv is read from here")
     p.add_argument("--block", default="v16")
     p.add_argument("--judge", default="claude-sonnet-5")
-    p.add_argument("--out", type=Path, default=repo / "evaluation/annotation_set")
+    p.add_argument("--out", type=Path, default=repo / "evaluation/results")
     p.add_argument("--by-model", action="store_true",
                    help="Per-generator means over every judged narrative, not the 20-item set")
     p.add_argument("--latex", action="store_true", help="With --by-model, emit the LaTeX body too")
     args = p.parse_args()
 
-    f = repo / "evaluation" / f"judgments_{args.block}_{args.judge}.jsonl"
+    f = repo / "evaluation/results" / f"judgments_{args.block}_{args.judge}.jsonl"
     if not f.exists():
         raise SystemExit(f"not found: {f}")
     verdicts: Dict[str, dict] = {}

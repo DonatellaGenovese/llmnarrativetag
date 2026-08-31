@@ -316,7 +316,10 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=11)
     p.add_argument("--blocks", nargs="+", default=["v16"],
                    help="Blocks to draw from; default the original 100-jet sample only")
-    p.add_argument("--out", type=Path, default=repo / "evaluation/annotation_set")
+    p.add_argument("--out", type=Path, default=repo / "evaluation/annotation_set",
+                   help="The set proper: the twenty items, and the key")
+    p.add_argument("--aux", type=Path, default=repo / "evaluation/results",
+                   help="Instructions, the tagged copies and the blank sheet")
     args = p.parse_args()
 
     cfg = yaml.safe_load(args.config.read_text())
@@ -337,14 +340,19 @@ def main() -> None:
     rng.shuffle(chosen)
     ids = [f"N{i:02d}" for i in range(1, len(chosen) + 1)]
 
-    out = args.out
+    # Two destinations. `out` holds the set proper — the twenty items and the key
+    # that says which is which. Everything else is reference material or a copy,
+    # and lives beside the verdicts in `aux` so the set itself stays exactly what
+    # was handed out.
+    out, aux = args.out, args.aux
+    aux.mkdir(parents=True, exist_ok=True)
     (out / "items").mkdir(parents=True, exist_ok=True)
     # The same twenty items a second time, tags intact. Same ids, so a row of the
     # scoring sheet refers to the same explanation in either directory. Hand out
     # one or the other, not both: whichever the annotators see, the LLM judge
     # must see too, or their agreement measures the difference in input as well
     # as the difference in judge.
-    (out / "items_tagged").mkdir(parents=True, exist_ok=True)
+    (aux / "items_tagged").mkdir(parents=True, exist_ok=True)
     for nid, rec in zip(ids, chosen):
         art = annotate_record(rec["artefact"])
         head = (f"ITEM {nid}\n{'=' * (5 + len(nid))}\n\n"
@@ -354,8 +362,8 @@ def main() -> None:
                 f"--- EXPLANATION (what the writer produced) ---\n\n")
         (out / "items" / f"{nid}.txt").write_text(head + rec["text"] + "\n")
         tagged = re.sub(r"[ \t]{2,}", " ", rec["tagged"]).strip()
-        (out / "items_tagged" / f"{nid}.txt").write_text(head + tagged + "\n")
-    (out / "FIELDS.txt").write_text(FIELDS_LEGEND)
+        (aux / "items_tagged" / f"{nid}.txt").write_text(head + tagged + "\n")
+    (aux / "FIELDS.txt").write_text(FIELDS_LEGEND)
 
     # The instructions the writer worked under, verbatim. Reference material, not
     # required reading: an annotator who wants to know whether a guardrail held
@@ -372,13 +380,13 @@ def main() -> None:
         if pr.get(name):
             blocks += ["", f"--- {name.upper()} (appended only when it applies) ---",
                        "", pr[name].strip()]
-    (out / "PROMPT.txt").write_text("\n".join(blocks) + "\n")
+    (aux / "PROMPT.txt").write_text("\n".join(blocks) + "\n")
 
     # Drawn from the sample itself so it cannot drift from what is being scored,
     # and from the model with the cleanest output so the example does not teach
     # a defect as if it were the norm.
     demo = next((r for r in chosen if r["model"] == "gemini-3.5-flash"), chosen[0])
-    (out / "WORKED_EXAMPLE.txt").write_text(worked_example(demo))
+    (aux / "WORKED_EXAMPLE.txt").write_text(worked_example(demo))
 
     # The glossary the annotator checks statements against, as prose.
     gl = yaml.safe_load((repo / cfg["glossary"]["path"]).read_text())
@@ -388,9 +396,9 @@ def main() -> None:
         lines += [f"{name}  —  {e['label']}" + (f" ({e['units']})" if e.get("units") else ""),
                   f"  Definition: {e['definition']}",
                   f"  Meaning:    {' '.join(e['meaning'].split())}", ""]
-    (out / "GLOSSARY.txt").write_text("\n".join(lines))
+    (aux / "GLOSSARY.txt").write_text("\n".join(lines))
 
-    with open(out / "scoring_sheet.csv", "w", newline="") as fh:
+    with open(aux / "scoring_sheet.csv", "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["id", *ITEMS, "evidence_span", "notes"])
         for nid in ids:

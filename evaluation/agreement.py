@@ -120,17 +120,24 @@ def score_column(fields: Sequence[str], judge: str, dim: str) -> str:
     )
 
 
-def load(root: Path):
-    reader = csv.DictReader(open(root / "judge_scores.csv"))
+def load(annotation_set: Path, results: Path):
+    """The set that was handed out, and what came back from it.
+
+    KEY.csv is the one thing read from the set itself: the provenance the
+    annotators never saw. Everything else here is an outcome.
+    """
+    reader = csv.DictReader(open(results / "judge_scores.csv"))
     scores = {r["id"]: r for r in reader}
     fields = reader.fieldnames or []
-    key = {r["id"]: r for r in csv.DictReader(open(root / "KEY.csv"))}
+    key = {r["id"]: r for r in csv.DictReader(open(annotation_set / "KEY.csv"))}
+    # Sheet order fixes which annotator is A and which is B, so the labels stay
+    # put across runs and match the paper's table.
     humans = {
-        f.stem.replace("human_", ""): {r["id"]: r for r in csv.DictReader(open(f))}
-        for f in sorted(root.glob("human_*.csv"))
+        f.stem: {r["id"]: r for r in csv.DictReader(open(f))}
+        for f in sorted(results.glob("annotator_*.csv"))
     }
     if not humans:
-        raise SystemExit(f"no human_*.csv in {root}")
+        raise SystemExit(f"no annotator_*.csv in {results}")
     return scores, key, humans, fields
 
 
@@ -143,12 +150,15 @@ def fmt(v: Optional[float], nd: int = 2, dagger: bool = False) -> str:
 def main() -> None:
     repo = Path(__file__).resolve().parents[1]
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--set", type=Path, default=repo / "evaluation/annotation_set")
+    p.add_argument("--set", type=Path, default=repo / "evaluation/annotation_set",
+                   help="The set as handed out; only KEY.csv is read from here")
+    p.add_argument("--results", type=Path, default=repo / "evaluation/results",
+                   help="Annotator sheets and judge verdicts")
     p.add_argument("--judge", default=MAIN_JUDGE)
     p.add_argument("--latex", action="store_true", help="Emit LaTeX table bodies too")
     args = p.parse_args()
 
-    scores, key, humans, fields = load(args.set)
+    scores, key, humans, fields = load(args.set, args.results)
     ids = sorted(scores)
     names = sorted(humans)
     cols = {d: score_column(fields, args.judge, d) for d, _, _ in DIMENSIONS}

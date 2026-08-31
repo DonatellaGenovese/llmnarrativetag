@@ -46,7 +46,7 @@ J=claude-sonnet-5
 echo "===== $J $(date '+%H:%M') ====="
 python -u evaluation/judge.py \
     --from-runs v16 --judges "$J" \
-    --out "evaluation/judgments_v16_${J}.jsonl" \
+    --out "evaluation/results/judgments_v16_${J}.jsonl" \
   || { echo "FAILED $J — rerun this script to resume"; exit 1; }
 
 touch evaluation/.judges.done

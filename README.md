@@ -65,7 +65,8 @@ narrative generation and evaluation, one directory per stage of the pipeline:
 - `evaluation/judge.py`: the LLM-as-a-judge rubric runner.
 - `evaluation/judge_report.py`: verdicts to spreadsheet, and `--by-model` the per-generator table.
 - `evaluation/agreement.py`: human-judge agreement, weighted kappa, negative recall.
-- `evaluation/annotation_set/`: the twenty items as handed out, the annotators' sheets, and the key.
+- `evaluation/annotation_set/`: the set itself — the twenty items exactly as handed out, and `KEY.csv`, the provenance the annotators never saw.
+- `evaluation/results/`: everything that came back or was derived — the judge's verdicts, the two annotator sheets, the scored spreadsheets — plus the instructions and the tagged copies of the items.
 - `run_judges.sh`: scores a whole block with the judge; resumable, holds a lock.
 - `particle_transformer/`: the upstream ParT toolkit, vendored (see the last section).
 
@@ -175,10 +176,18 @@ Backends and their credentials:
 
 ```bash
 ./run_judges.sh                                # scores block v16, resumable
-python -m evaluation.judge_report              # the two annotation-set CSVs
+python -m evaluation.judge_report              # the two scored CSVs, into results/
 python -m evaluation.judge_report --by-model   # mean ± SD per generator (--latex for the body)
 python -m evaluation.agreement                 # human ↔ judge tables (--latex)
 ```
+
+`annotation_set/` holds only what defines the set: the twenty items as the
+annotators and the judge received them, and `KEY.csv` mapping each id back to
+its generator and jet. Everything a run produced or consumed alongside it —
+verdicts, sheets, instructions, tagged copies — is in `results/`, so the set
+itself cannot drift from what was handed out. The annotator sheets are
+`annotator_1.csv` and `annotator_2.csv`; sheet order fixes which is A and which
+is B in the tables.
 
 ## Results
 

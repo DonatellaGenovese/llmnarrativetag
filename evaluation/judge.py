@@ -211,7 +211,8 @@ def main() -> None:
         sys.exit(f"unknown ids: {' '.join(missing)}")
 
     tag = f"_{args.from_runs}" if args.from_runs else ""
-    out_path = args.out or (repo / f"evaluation/judgments{tag}_{prompt['id']}.jsonl")
+    out_path = args.out or (repo / f"evaluation/results/judgments{tag}_{prompt['id']}.jsonl")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Everything already scored, so an interrupted run resumes instead of paying
     # for its own history again. Only verdicts count as done: a record carrying
