@@ -2,18 +2,20 @@
 # Official TopLandscape surrogate: train/val/test with ParT teacher logits.
 #
 # Prerequisites: ParT logits parquet for train/val/test under predict_output/.
-# Usage:
-#   ./surrogate/run_official_top.sh              # full splits
-#   ./surrogate/run_official_top.sh 5000         # cap each split (smoke)
+# Run from the repository root:
+#   ./surrogate/scripts/run_official_top.sh              # full splits
+#   ./surrogate/scripts/run_official_top.sh 5000         # cap each split (smoke)
 
 set -eo pipefail
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO"
 
 MAX_JETS="${1:-}"
 OUT="$REPO/surrogate/outputs/top"
-PRED_DIR="$REPO/training/TopLandscape/ParT-FineTune/20260725-162630_example_ParticleTransformer_finetune_ranger_lr0.0001_batch512/predict_output"
-DATA="$REPO/datasets/TopLandscape"
+# The teacher's data and checkpoints live inside the vendored ParT tree.
+PT="$REPO/particle_transformer"
+PRED_DIR="$PT/training/TopLandscape/ParT-FineTune/20260725-162630_example_ParticleTransformer_finetune_ranger_lr0.0001_batch512/predict_output"
+DATA="$PT/datasets/TopLandscape"
 
 set +u
 source /opt/miniforge3/etc/profile.d/conda.sh

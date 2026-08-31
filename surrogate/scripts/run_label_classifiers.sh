@@ -1,12 +1,12 @@
 #!/bin/bash
 # Train Logistic / EBM / GBDT on truth labels (same features as ParT surrogates).
 #
-# Usage:
-#   ./surrogate/run_label_classifiers.sh                # full TopLandscape
-#   ./surrogate/run_label_classifiers.sh 5000           # smoke
+# Run from the repository root:
+#   ./surrogate/scripts/run_label_classifiers.sh         # full TopLandscape
+#   ./surrogate/scripts/run_label_classifiers.sh 5000    # smoke
 
 set -eo pipefail
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO"
 
 MAX_JETS="${1:-}"

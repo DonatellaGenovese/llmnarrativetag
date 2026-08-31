@@ -1,1 +1,0 @@
-../../surrogate/scripts/run_label_classifiers.sh

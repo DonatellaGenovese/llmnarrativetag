@@ -2,12 +2,15 @@
 # Dump ParT logits on TopLandscape train + val (scalars only; no pf_* tensors).
 # Uses the existing best FineTune checkpoint.
 #
-# Usage:
-#   source .venv/bin/activate
-#   ./dump_toplandscape_train_val_logits.sh
+# Run from the repository root:
+#   ./scripts/dump_toplandscape_train_val_logits.sh
 
 set -eo pipefail
-cd "$(dirname "$0")"
+# Weaver resolves its network and data configs relative to the ParT tree, and
+# the datasets and checkpoints live there too, so this steps into it. Invoke it
+# from the repository root; nothing here depends on your working directory.
+HERE="$(cd "$(dirname "$0")" && pwd)"
+cd "$HERE/../particle_transformer"
 source env.sh
 source .venv/bin/activate
 
@@ -24,7 +27,7 @@ run_one () {
   local infile="$2"
   local outfile="$3"
   echo "=== Predicting $split ==="
-  python predict_TopLandscape_logits.py \
+  python "$HERE/predict_TopLandscape_logits.py" \
     --data-test "$infile" \
     --data-config "$CFG" \
     --network-config "$NET" \

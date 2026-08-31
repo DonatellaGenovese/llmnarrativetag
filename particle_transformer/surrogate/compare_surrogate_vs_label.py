@@ -1,1 +1,0 @@
-../../surrogate/compare_surrogate_vs_label.py
