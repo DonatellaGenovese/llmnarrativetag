@@ -1,1 +1,0 @@
-../scripts/infer_JetClass_logits.sh

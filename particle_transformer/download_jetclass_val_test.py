@@ -1,1 +1,0 @@
-../scripts/download_jetclass_val_test.py

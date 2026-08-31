@@ -22,7 +22,7 @@ surrogate/            Ridge / EBM / GBDT surrogate distillation       (Part 2)
   metrics/top/        JSON/TXT numbers from the official run (tracked)
 narrative/            LLM narrative generation and verification       (Part 3)
 evaluation/           LLM-as-a-judge + human annotation set           (Part 4)
-scripts/              ParT teacher inference / logit dumping
+scripts/              ParT teacher logit dumping (train / val / test)
 particle_transformer/ Vendored ParT training toolkit (see the last section)
 ```
 
