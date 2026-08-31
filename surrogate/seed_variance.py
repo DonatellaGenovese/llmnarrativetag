@@ -10,6 +10,11 @@ R²(EBM) = 0.018 in the official run: a claim that ParT's decision is nearly
 additive is only as strong as that gap is stable.
 
 Ridge is fitted once. It is a closed-form convex solution with no seed.
+
+This is also, despite the name, the **only** place average decision ordering is
+computed — for the three surrogates against the teacher, and for the teacher
+against the physical truth ordering. Nothing else in the repo produces ADO, so
+this file is not the accessory analysis it looks like.
 """
 
 from __future__ import annotations
@@ -81,6 +86,18 @@ def run(config_path: Path, out_dir: Path, seeds: List[int], max_jets: int | None
     bkg = np.flatnonzero(truth_top == 0)
     ado_idx = (rng.choice(sig, ADO_PAIRS), rng.choice(bkg, ADO_PAIRS))
 
+    # The teacher's own ordering, against the physical truth rather than against
+    # itself. Every pair here is (signal, background), so the truth ordering puts
+    # the first above the second and this is just the fraction ParT ranks that
+    # way. It is the reference the surrogate ADOs are read against — "the
+    # surrogate tracks the tagger about as closely as the tagger tracks the
+    # physics" is a comparison between this number and the EBM's — so it is
+    # computed on the same pairs and not quoted from ParT's AUC, which the
+    # Mann-Whitney identity makes it equal to in expectation but not by
+    # construction. Ties count against, as they do in `_metrics`.
+    part_ado_vs_truth = float(np.mean(y_te[ado_idx[0]] > y_te[ado_idx[1]]))
+    print(f"ParT ADO vs truth ordering: {part_ado_vs_truth:.4f}")
+
     results: Dict[str, List[Dict[str, float]]] = {"ebm": [], "gbdt": []}
 
     # Ridge once: deterministic, no seed.
@@ -143,6 +160,8 @@ def run(config_path: Path, out_dir: Path, seeds: List[int], max_jets: int | None
     summary = {
         "seeds": seeds,
         "n_test": int(len(df_te)),
+        "ado_pairs": ADO_PAIRS,
+        "part": {"ado_vs_truth": part_ado_vs_truth},
         "ridge": ridge_m,
         "ebm": {k: agg(results["ebm"], k) for k in results["ebm"][0]},
         "gbdt": {k: agg(results["gbdt"], k) for k in results["gbdt"][0]},
@@ -163,6 +182,7 @@ def run(config_path: Path, out_dir: Path, seeds: List[int], max_jets: int | None
     for k, a in summary["gaps"].items():
         print("%-24s %12.6f %12.6f %12.6f" % (f"gap {k}", a["mean"], a["sd"],
                                               a["max"] - a["min"]))
+    print("%-24s %12.6f" % ("ParT ado_vs_truth", part_ado_vs_truth))
     print(f"\nWrote → {out_dir / 'seed_variance.json'}")
     return summary
 

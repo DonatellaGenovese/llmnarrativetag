@@ -64,13 +64,18 @@ basis:
 | Ridge (log + z) | additive-linear lower bound | 0.886 | 0.962 | 0.932 | 0.955 |
 | **EBM, 0 interactions** | **the interpretable surrogate** | **0.962** | **0.983** | **0.951** | **0.975** |
 | GBDT (unconstrained) | upper bound, not interpretable | 0.980 | 0.988 | 0.967 | 0.979 |
-| ParT (teacher) | — | — | — | — | 0.983 |
+| ParT (teacher) | the thing being explained | — | 0.983 † | — | 0.983 |
+
+† ParT's ADO is against the **physical truth ordering**, not against itself. The
+coincidence is the point: the EBM tracks the tagger's ranking (0.9827) about as
+closely as the tagger tracks the underlying physics (0.9832), on the same
+500 k signal/background pairs.
 
 R² and agreement come from `train_surrogates_top.py` and
-`eval_classifier_metrics.py`. **The ADO column comes from `seed_variance.py`
+`eval_classifier_metrics.py`. **Both ADO figures come from `seed_variance.py`
 and from nowhere else** — it is the only place average decision ordering is
-computed, over 500 k fixed signal/background pairs, so it is easy to mistake for
-an accessory analysis and delete.
+computed, so despite its name it is not an accessory analysis and must not be
+deleted with one.
 
 Fit on train (1.21 M jets), selected on val (403 k), reported on test (404 k).
 The Ridge↔EBM gap is what the linear form misses; the EBM↔GBDT gap is how much
