@@ -120,14 +120,14 @@ narrative/
   generator.py                 glossary rendering, prompt assembly, prompt hashing
   verifier.py                  tag extraction, equality, completeness, bare-number sieve
   orchestrator.py              abstention gate → generate → verify → retry
-  metrics.py                   aggregates a run's JSONL into the pass-rate table
-  blocks_report.py             pools the blocks into one table, re-verifying each
+  blocks_report.py             the pass-rate table, re-verifying every narrative
+  inspect.py                   renders a run as artefact-beside-prose, for reading
   outputs/top/                 reference stats and narratives (local, not tracked)
 ```
 
 Data flows one way — `stats.py` → `artefact.py` → `generator.py` →
 `llm_client.py` → `verifier.py` — with `orchestrator.py` driving and
-`metrics.py` reading what it wrote. `artefact.py` and `verifier.py` can be
+`blocks_report.py` reading what it wrote. `artefact.py` and `verifier.py` can be
 exercised with no API key.
 
 ### Selecting the jets
@@ -164,7 +164,8 @@ python -m narrative.orchestrator \
     --jets-file narrative/outputs/top/narratives/run100_jets.json \
     --out narrative/outputs/top/narratives/scratch_gemini-3.5-flash-lite.jsonl
 
-python -m narrative.metrics narrative/outputs/top/narratives/scratch_gemini-3.5-flash-lite.jsonl
+# Read the result. --blocks takes file prefixes, so this scores scratch_*.jsonl.
+python -m narrative.blocks_report --blocks scratch
 ```
 
 A sweep is that last pair looped over models, which is what
