@@ -1,1 +1,0 @@
-../scripts/infer_QuarkGluon_logits.sh

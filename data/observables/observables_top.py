@@ -1,4 +1,4 @@
-"""TopLandscape jet observables via FastJet + fjcontrib (cppyy)."""
+"""TopLandscape jet observables via FastJet + fjcontrib."""
 
 from __future__ import annotations
 

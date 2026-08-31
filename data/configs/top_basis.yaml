@@ -11,7 +11,6 @@ ecf:
   truncate_C3: 50
   truncate_N3: 40
 
-# Feature columns written to the feature table (Tier A + B)
 observables:
   - m
   - m_SD
@@ -24,7 +23,6 @@ observables:
   - pT
   - n_const
 
-# ParT teacher columns expected in the prediction parquet
 targets:
   z_top: logit_jet_isTop
   z_qcd: logit_jet_isQCD
@@ -35,13 +33,9 @@ targets:
 # Weaver class index 0 = top, 1 = QCD. Used by label-trained classifiers.
 positive_class_index: 0
 
-# Defaults (override on CLI). Official protocol uses file splits, not random fracs.
-prototype:
-  max_jets: null
-  seed: 42
-  # legacy random-split fracs (only if a single-file prototype is used)
-  train_frac: 0.70
-  val_frac: 0.15
+# The official protocol uses the dataset's own file splits, so the seed only
+# affects model fitting (EBM/GBDT), not how the data is divided.
+seed: 42
 
 # Surrogate fitting
 fit:

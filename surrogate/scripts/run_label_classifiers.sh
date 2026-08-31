@@ -2,17 +2,14 @@
 # Train Logistic / EBM / GBDT on truth labels (same features as ParT surrogates).
 #
 # Usage:
-#   ./surrogate/run_label_classifiers.sh top           # full TopLandscape
-#   ./surrogate/run_label_classifiers.sh qg            # full QuarkGluon
-#   ./surrogate/run_label_classifiers.sh both          # both
-#   ./surrogate/run_label_classifiers.sh top 5000      # smoke
+#   ./surrogate/run_label_classifiers.sh                # full TopLandscape
+#   ./surrogate/run_label_classifiers.sh 5000           # smoke
 
 set -eo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-DATASET="${1:-both}"
-MAX_JETS="${2:-}"
+MAX_JETS="${1:-}"
 
 set +u
 source /opt/miniforge3/etc/profile.d/conda.sh
@@ -52,21 +49,6 @@ run_one () {
   fi
 }
 
-case "$DATASET" in
-  top)
-    run_one top "$REPO/surrogate/configs/top_basis.yaml"
-    ;;
-  qg)
-    run_one qg "$REPO/surrogate/configs/qg_basis.yaml"
-    ;;
-  both)
-    run_one top "$REPO/surrogate/configs/top_basis.yaml"
-    run_one qg "$REPO/surrogate/configs/qg_basis.yaml"
-    ;;
-  *)
-    echo "Usage: $0 {top|qg|both} [max_jets]"
-    exit 1
-    ;;
-esac
+run_one top "$REPO/surrogate/configs/top_basis.yaml"
 
 echo "DONE"

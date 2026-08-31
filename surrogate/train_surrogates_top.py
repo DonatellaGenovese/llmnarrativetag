@@ -153,7 +153,7 @@ def train_all(
     cfg = _load_yaml(config_path)
     obs: List[str] = list(cfg["observables"])
     fit = cfg["fit"]
-    seed = int(cfg.get("prototype", {}).get("seed", 42))
+    seed = int(cfg.get("seed", 42))
 
     def _load(path: Path) -> pd.DataFrame:
         df = pd.read_parquet(path)

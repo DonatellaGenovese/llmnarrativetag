@@ -1,1 +1,0 @@
-../../surrogate/scripts/run_official_qg.sh

@@ -1,1 +1,0 @@
-../scripts/dump_quarkgluon_train_logits.sh
