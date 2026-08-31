@@ -62,11 +62,17 @@ class Orchestrator:
         model: Optional[str] = None,
         backend: Optional[str] = None,
         reasoning_effort: Optional[str] = None,
+        prompt: Optional[Path] = None,
     ):
         self.repo = repo
         self.cfg = yaml.safe_load(config_path.read_text())
         # CLI overrides, so one config serves every model in a sweep across
-        # providers without being edited between runs.
+        # providers without being edited between runs. `prompt` additionally
+        # lets an ablation hold everything else fixed while varying one prompt:
+        # comparing two prompts through two edited configs invites a second,
+        # unnoticed difference between them.
+        if prompt:
+            self.cfg["prompt"] = {**self.cfg["prompt"], "path": str(prompt)}
         if model:
             self.cfg["llm"] = {**self.cfg["llm"], "model": model}
         if backend:
@@ -195,6 +201,8 @@ def main():
     p.add_argument("--backend", default=None, help="Override llm.backend from the config")
     p.add_argument("--reasoning-effort", default=None,
                    help="none/low/medium/high; for models that cannot switch reasoning off")
+    p.add_argument("--prompt", type=Path, default=None,
+                   help="Override prompt.path from the config; for prompt ablations")
     p.add_argument("--jets-file", type=Path, default=None,
                    help="Shared random sample; created on first use, reused after")
     p.add_argument("--sample", type=int, default=None, help="Sample size for --jets-file")
@@ -203,7 +211,7 @@ def main():
     args = p.parse_args()
 
     orch = Orchestrator(repo, args.config, model=args.model, backend=args.backend,
-                        reasoning_effort=args.reasoning_effort)
+                        reasoning_effort=args.reasoning_effort, prompt=args.prompt)
 
     if args.jets_file:
         import pandas as pd

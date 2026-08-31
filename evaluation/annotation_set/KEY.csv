@@ -1,0 +1,21 @@
+id,model,block,jet_id,decision,regime,residual,regime_meaning,words
+N01,deepseek-v4-flash,v16,15596,top,full,0.565,|r| < 1: the interpretable model reproduces the decision closely,329
+N02,deepseek-v4-flash,v16,177026,qcd,caveat,1.448,"1 <= |r| < 2: it reproduces the decision only partly, and the writer was told to say so up front and keep the rest brief",232
+N03,gemini-3.5-flash-lite,v16,310745,top,caveat,1.201,"1 <= |r| < 2: it reproduces the decision only partly, and the writer was told to say so up front and keep the rest brief",447
+N04,gpt-oss-120b,v16,247941,top,caveat,1.998,"1 <= |r| < 2: it reproduces the decision only partly, and the writer was told to say so up front and keep the rest brief",358
+N05,gemini-3.5-flash,v16,255805,qcd,caveat,1.428,"1 <= |r| < 2: it reproduces the decision only partly, and the writer was told to say so up front and keep the rest brief",524
+N06,deepseek-v4-flash,v16,182312,top,full,0.029,|r| < 1: the interpretable model reproduces the decision closely,353
+N07,gemini-3.5-flash-lite,v16,87354,top,full,0.971,|r| < 1: the interpretable model reproduces the decision closely,690
+N08,gemini-3.5-flash-lite,v16,242440,qcd,caveat,1.418,"1 <= |r| < 2: it reproduces the decision only partly, and the writer was told to say so up front and keep the rest brief",471
+N09,gpt-oss-120b,v16,164242,top,full,0.367,|r| < 1: the interpretable model reproduces the decision closely,390
+N10,deepseek-v4-flash,v16,230038,top,caveat,1.421,"1 <= |r| < 2: it reproduces the decision only partly, and the writer was told to say so up front and keep the rest brief",228
+N11,gemini-3.5-flash,v16,15596,top,full,0.565,|r| < 1: the interpretable model reproduces the decision closely,581
+N12,gpt-oss-120b,v16,401113,qcd,full,0.228,|r| < 1: the interpretable model reproduces the decision closely,282
+N13,gpt-oss-120b,v16,255805,qcd,caveat,1.428,"1 <= |r| < 2: it reproduces the decision only partly, and the writer was told to say so up front and keep the rest brief",285
+N14,gpt-oss-120b,v16,30917,top,full,0.664,|r| < 1: the interpretable model reproduces the decision closely,313
+N15,gemini-3.5-flash,v16,208697,qcd,full,0.078,|r| < 1: the interpretable model reproduces the decision closely,452
+N16,gemini-3.5-flash-lite,v16,22279,qcd,full,0.518,|r| < 1: the interpretable model reproduces the decision closely,464
+N17,gemini-3.5-flash-lite,v16,270395,qcd,full,0.559,|r| < 1: the interpretable model reproduces the decision closely,383
+N18,deepseek-v4-flash,v16,105104,qcd,full,0.848,|r| < 1: the interpretable model reproduces the decision closely,233
+N19,gemini-3.5-flash,v16,279752,top,full,0.820,|r| < 1: the interpretable model reproduces the decision closely,640
+N20,gemini-3.5-flash,v16,206470,top,caveat,1.593,"1 <= |r| < 2: it reproduces the decision only partly, and the writer was told to say so up front and keep the rest brief",376

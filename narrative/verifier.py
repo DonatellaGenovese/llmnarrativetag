@@ -26,6 +26,18 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 # [TAG]number[/TAG], where the closing tag must match the opening one.
+#
+# A generic closer, [TAG]number[/], was tried and rejected on measurement. The
+# argument for it was sound in the abstract — the field is named by the opening
+# tag, so requiring the name twice is a cost with no informational return — and
+# it did help the models that could not keep a pair straight: on
+# gemini-3.5-flash-lite it moved Form 0.93 -> 0.99 and NoBare 0.80 -> 0.90, on
+# gpt-oss-120b Comp 0.13 -> 0.24. But it cost Comp on the models that had no
+# mismatched pairs to fix (gemini-3.5-flash 1.00 -> 0.93), because a closer that
+# is free to write is also free to invent: [pct], [decision], [ZS] and
+# [other_class] all appeared as tags for the first time. Net on the paired jets,
+# gemini-3.5-flash fell 0.94 -> 0.84, p = 0.022 — the only significant contrast
+# in the ablation, and a regression. The gain landed where it was not needed.
 TAG_RE = re.compile(r"\[([A-Za-z][A-Za-z0-9_]*)\]\s*([+-]?\d+(?:\.\d+)?)\s*\[/\1\]")
 ANY_BRACKET_RE = re.compile(r"\[/?[A-Za-z][A-Za-z0-9_]*\]")
 DIGIT_RE = re.compile(r"\d")
@@ -50,10 +62,31 @@ PER_FEATURE_TAGS = {"V": "value", "I": "phi", "R": "rarity"}
 # against one invented afterwards. The vocabulary is closed, so a paraphrase is
 # a violation rather than a gap in a keyword list.
 READING_TOP_K = 5
-RARITY_BANDS = ((2.0, "extreme"), (10.0, "unusual"), (25.0, "uncommon"), (float("inf"), "ordinary"))
-# `mid` and `ordinary` cover the same region up to the edges: rarity above 25
-# holds exactly when pct lies strictly between 25 and 75, so the two
-# vocabularies cannot contradict each other.
+# Three bands, not four. The fourth boundary at 25 produced a systematic drift
+# — six values between 16 and 23 all called `ordinary` — while no value came
+# within half a point of it, so it was not a boundary error but a disagreement
+# over a whole range. The two that remain sit where the values are sparsest:
+# 4.9% of rarities fall within +-0.5 of 2 and 2.7% of 10, against 11.3% of 1.
+# Calibrated on the five leading observables, the only ones obliged to carry a
+# judgement and far more extreme than the tail: median rarity 4.42 against 18.54.
+RARITY_BANDS = ((2.0, "extreme"), (10.0, "unusual"), (float("inf"), "ordinary"))
+# Side bands are independent of the rarity bands and do not align with them.
+# The two describe different things — how unusual, and on which side — so they
+# need not agree.
+#
+# A two-word side, low/high cut at 50, was tried and not adopted. It is better
+# targeted than this rule and it worked exactly as intended: `mid` went from
+# being the subject of every S violation to being written zero times in 1800
+# tags, and deepseek's S errors fell from 2 to 1. What it did not do is show up
+# in the accept rate. Paired against this rule the four models came out
+# 0.87/0.61/0.69/0.10 against 0.94/0.57/0.64/0.10, no contrast significant, and
+# the families the change cannot touch moved by more than the family it could:
+# deepseek's `Read` fell 0.80 -> 0.74 entirely through Q (14 -> 21) and D
+# (8 -> 10). On gemini-3.5-flash-lite 50 of 90 jets flipped verdict. TOTAL is a
+# conjunction over ~46 tag decisions, so it goes as p^N and a per-tag drift too
+# small to see swings it; at n = 90 it cannot resolve a prompt edit, and the
+# per-family rates are what carry the signal. Kept as evidence that a targeted
+# fix and a measurable improvement are different claims.
 SIDE_BANDS = ((25.0, "low"), (75.0, "mid"), (float("inf"), "high"))
 WORD_RE = re.compile(r"\[([A-Za-z][A-Za-z0-9_]*)\]\s*([A-Za-z]+)\s*\[/\1\]")
 
@@ -193,6 +226,24 @@ def required_tags(artefact: dict) -> List[str]:
     return sorted(list(exp) + [t for t in keep if t not in exp])
 
 
+# A run of characters that could spell a physics name: alphanumerics plus the
+# punctuation that appears inside one. Deliberately includes `.`, so that a
+# decimal number is taken whole and judged whole rather than split into digits
+# that individually look harmless.
+NAME_TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_/*^.+-]*")
+
+
+def _normalise_name(text: str) -> str:
+    """A name reduced to its letters and digits, or "" if it has no letter.
+
+    `tau2/tau1`, `tau2/1` and `tau21` do not all reduce to the same string — the
+    first keeps its second `tau` — which is why both the observable name and its
+    glossary label are normalised and matched against.
+    """
+    core = re.sub(r"[^A-Za-z0-9]", "", text)
+    return core if any(c.isalpha() for c in core) else ""
+
+
 def _allowed_literals(artefact: dict, glossary: Optional[dict]) -> List[str]:
     """Strings that legitimately contain digits outside a tag.
 
@@ -294,11 +345,27 @@ def verify(
 
     # 4. Bare numbers: a quantitative claim the verifier cannot check.
     stripped = ANY_BRACKET_RE.sub(" ", residual)
-    for literal in list(_allowed_literals(artefact, glossary)) + list(extra_literals):
+    literals = list(_allowed_literals(artefact, glossary)) + list(extra_literals)
+    for literal in literals:
         # Whole tokens only: an observable named `m` must not eat the m of "median".
         stripped = re.sub(
             rf"(?<![A-Za-z0-9_]){re.escape(literal)}(?![A-Za-z0-9_])", " ", stripped
         )
+    # Second pass, on the spelling rather than the string. A narrator may write a
+    # known name a different way — `tau2/1` for `tau21`, whose glossary label is
+    # "N-subjettiness ratio tau2/tau1" — and the exact-match pass above misses it,
+    # charging a bare number for what is a name.
+    #
+    # Matching after normalisation, rather than whitelisting fragments, is what
+    # keeps this safe. Whitelisting `tau2` and `1` separately would let a real
+    # measurement through; requiring the whole token to normalise onto a whole
+    # known name cannot, because every name carries a letter and a bare number
+    # never does. `175.27` normalises to `17527` and `175GeV` to `175GeV`,
+    # neither of which is a name, so both are still caught.
+    known = {n for n in (_normalise_name(x) for x in literals) if n}
+    stripped = NAME_TOKEN_RE.sub(
+        lambda m: " " if _normalise_name(m.group(0)) in known else m.group(0), stripped
+    )
     for line in stripped.splitlines():
         if DIGIT_RE.search(line):
             snippet = line.strip()

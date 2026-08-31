@@ -1,0 +1,116 @@
+ITEM N08
+========
+
+--- XAI OUTPUT (what the writer was given; see FIELDS.txt) ---
+    the tag on the right is where that field appears in the text
+
+{
+  "schema_version": 2,
+  "jet_id": 242440,
+  "decision": "qcd",              no tag — appears in prose, and inside [D..]
+  "other_class": "top",           no tag — but pct, rarity, [S..] and [Q..] are all
+                                  measured against THIS class, never the chosen one
+  "score_tagger": 5.2,            [Z]
+  "score_pct": 35,                [ZP]
+  "score_reconstructed": 3.78,    [G]
+  "recon_pct": 17,                [GP]   and [GQ] = "worse"
+  "intercept": 0.95,              [B]
+  "features": [
+    {
+      "i": "01",
+      "name": "C2_double_b1",
+      "value": 0.29,              [V01]
+      "phi": -2.39,               [I01]  and [D01] = "top"
+      "pct": 88.66,               no tag — fixes [S01] = "high"
+      "rarity": 11.34             [R01]  and [Q01] = "ordinary"
+    },
+    {
+      "i": "02",
+      "name": "m",
+      "value": 106.37,            [V02]
+      "phi": 2.27,                [I02]  and [D02] = "qcd"
+      "pct": 0.03,                no tag — fixes [S02] = "low"
+      "rarity": 0.03              [R02]  and [Q02] = "extreme"
+    },
+    {
+      "i": "03",
+      "name": "D2_double_b1",
+      "value": 3.82,              [V03]
+      "phi": 1.57,                [I03]  and [D03] = "qcd"
+      "pct": 99.99,               no tag — fixes [S03] = "high"
+      "rarity": 0.01              [R03]  and [Q03] = "extreme"
+    },
+    {
+      "i": "04",
+      "name": "n_const",
+      "value": 44.0,              [V04]
+      "phi": -0.84,               [I04]  and [D04] = "top"
+      "pct": 23.42,               no tag — fixes [S04] = "low"
+      "rarity": 23.42             [R04]  and [Q04] = "ordinary"
+    },
+    {
+      "i": "05",
+      "name": "m_SD",
+      "value": 27.13,             [V05]
+      "phi": 0.83,                [I05]  and [D05] = "qcd"
+      "pct": 0.19,                no tag — fixes [S05] = "low"
+      "rarity": 0.19              [R05]  and [Q05] = "extreme"
+    },
+    {
+      "i": "06",
+      "name": "C3_double_b1",
+      "value": 0.37,              [V06]
+      "phi": 0.57,                [I06]  and [D06] = "qcd"
+      "pct": 97.35,               no tag — fixes [S06] = "high"
+      "rarity": 2.65              [R06]  and [Q06] = "unusual"
+    },
+    {
+      "i": "07",
+      "name": "tau32",
+      "value": 0.71,              [V07]
+      "phi": 0.35,                [I07]  and [D07] = "qcd"
+      "pct": 87.2,                no tag — fixes [S07] = "high"
+      "rarity": 12.8              [R07]  and [Q07] = "ordinary"
+    },
+    {
+      "i": "08",
+      "name": "N3_b1",
+      "value": 1.61,              [V08]
+      "phi": 0.22,                [I08]  and [D08] = "qcd"
+      "pct": 87.3,                no tag — fixes [S08] = "high"
+      "rarity": 12.7              [R08]  and [Q08] = "ordinary"
+    },
+    {
+      "i": "09",
+      "name": "tau21",
+      "value": 0.72,              [V09]
+      "phi": 0.13,                [I09]  and [D09] = "qcd"
+      "pct": 98.4,                no tag — fixes [S09] = "high"
+      "rarity": 1.6               [R09]  and [Q09] = "extreme"
+    },
+    {
+      "i": "10",
+      "name": "pT",
+      "value": 569.29,            [V10]
+      "phi": 0.12,                [I10]  and [D10] = "qcd"
+      "pct": 23.16,               no tag — fixes [S10] = "low"
+      "rarity": 23.16             [R10]  and [Q10] = "ordinary"
+    }
+  ]
+}
+
+--- EXPLANATION (what the writer produced) ---
+
+The decomposition does not fully account for this decision. The tagger assigned this jet to the qcd class, yielding a score_tagger of [Z]5.2[/Z], which sits above [ZP]35[/ZP] percent of jets assigned to the same class. The score_reconstructed is reproduced as [G]3.78[/G], and this jet is reconstructed [GQ]worse[/GQ] than most, with a recon_pct of [GP]17[/GP] percent. These values sit on the same scale as the fixed baseline intercept of [B]0.95[/B] and the contributions described below.
+
+The leading observable is C2_double_b1, which has a measured value of [V01]0.29[/V01] and contributes [I01]-2.39[/I01] towards [D01]top[/D01]. This energy correlation ratio is strongly correlated with jet mass and pT, and low values favour two-pronged structure. Its value sits at [S01]high[/S01] within the top class with a rarity of [R01]11.34[/R01] percent, which is [Q01]ordinary[/Q01]. 
+
+The second observable is m, measuring ungroomed jet mass with a value of [V02]106.37[/V02] GeV and a contribution of [I02]2.27[/I02] towards [D02]qcd[/D02]. As the invariant mass of the whole jet, a hadronically decaying top quark deposits its decay products in one jet so the mass concentrates near the top mass, while QCD jets acquire mass only from radiation and sit lower. Its value sits at [S02]low[/S02] within the top class with a rarity of [R02]0.03[/R02] percent, which is [Q02]extreme[/Q02]. 
+
+The third observable is D2_double_b1, with a value of [V03]3.82[/V03] and a contribution of [I03]1.57[/I03] towards [D03]qcd[/D03]. This energy correlation ratio is built by power counting to separate two-pronged from one-pronged jets with the mass correlation of C2 largely removed, where low values favour two prongs specifically. Its value sits at [S03]high[/S03] within the top class with a rarity of [R03]0.01[/R03] percent, which is [Q03]extreme[/Q03]. 
+
+The fourth observable is n_const, representing constituent multiplicity with a value of [V04]44.0[/V04] and a contribution of [I04]-0.84[/I04] towards [D04]top[/D04]. This counts how many particles the jet contains, growing with the amount of radiation in the shower and with the number of hard partons initiating it. Its value sits at [S04]low[/S04] within the top class with a rarity of [R04]23.42[/R04] percent, which is [Q04]ordinary[/Q04]. 
+
+The fifth observable is m_SD, measuring soft-drop mass with a value of [V05]27.13[/V05] GeV and a contribution of [I05]0.83[/I05] towards [D05]qcd[/D05]. This is the jet mass after soft radiation has been groomed away, leaving only the hard core and rendering it less sensitive to pile-up and underlying event than the ungroomed mass. Its value sits at [S05]low[/S05] within the top class with a rarity of [R05]0.19[/R05] percent, which is [Q05]extreme[/Q05]. 
+
+The remaining observables follow with their values and contributions. C3_double_b1 has a value of [V06]0.37[/V06] and a contribution of [I06]0.57[/I06]. tau32 has a value of [V07]0.71[/V07] and a contribution of [I07]0.35[/I07]. N3_b1 has a value of [V08]1.61[/V08] and a contribution of [I08]0.22[/I08]. tau21 has a value of [V09]0.72[/V09] and a contribution of [I09]0.13[/I09]. Finally, pT has a value of [V10]569.29[/V10] GeV and a contribution of [I10]0.12[/I10].

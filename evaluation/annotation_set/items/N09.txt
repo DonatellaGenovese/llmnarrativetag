@@ -1,0 +1,126 @@
+ITEM N09
+========
+
+--- XAI OUTPUT (what the writer was given; see FIELDS.txt) ---
+    the tag on the right is where that field appears in the text
+
+{
+  "schema_version": 2,
+  "jet_id": 164242,
+  "decision": "top",              no tag — appears in prose, and inside [D..]
+  "other_class": "qcd",           no tag — but pct, rarity, [S..] and [Q..] are all
+                                  measured against THIS class, never the chosen one
+  "score_tagger": 1.67,           [Z]
+  "score_pct": 15,                [ZP]
+  "score_reconstructed": 1.3,     [G]
+  "recon_pct": 68,                [GP]   and [GQ] = "better"
+  "intercept": -0.95,             [B]
+  "features": [
+    {
+      "i": "01",
+      "name": "D2_double_b1",
+      "value": 1.45,              [V01]
+      "phi": 1.3,                 [I01]  and [D01] = "top"
+      "pct": 9.3,                 no tag — fixes [S01] = "low"
+      "rarity": 9.3               [R01]  and [Q01] = "unusual"
+    },
+    {
+      "i": "02",
+      "name": "m",
+      "value": 144.8,             [V02]
+      "phi": 1.07,                [I02]  and [D02] = "top"
+      "pct": 87.41,               no tag — fixes [S02] = "high"
+      "rarity": 12.59             [R02]  and [Q02] = "ordinary"
+    },
+    {
+      "i": "03",
+      "name": "n_const",
+      "value": 61.0,              [V03]
+      "phi": -0.82,               [I03]  and [D03] = "qcd"
+      "pct": 84.55,               no tag — fixes [S03] = "high"
+      "rarity": 15.45             [R03]  and [Q03] = "ordinary"
+    },
+    {
+      "i": "04",
+      "name": "N3_b1",
+      "value": 1.35,              [V04]
+      "phi": 0.55,                [I04]  and [D04] = "top"
+      "pct": 2.5,                 no tag — fixes [S04] = "low"
+      "rarity": 2.5               [R04]  and [Q04] = "unusual"
+    },
+    {
+      "i": "05",
+      "name": "m_SD",
+      "value": 134.45,            [V05]
+      "phi": 0.35,                [I05]  and [D05] = "top"
+      "pct": 88.16,               no tag — fixes [S05] = "high"
+      "rarity": 11.84             [R05]  and [Q05] = "ordinary"
+    },
+    {
+      "i": "06",
+      "name": "C2_double_b1",
+      "value": 0.2,               [V06]
+      "phi": -0.29,               [I06]  and [D06] = "qcd"
+      "pct": 59.58,               no tag — fixes [S06] = "mid"
+      "rarity": 40.42             [R06]  and [Q06] = "ordinary"
+    },
+    {
+      "i": "07",
+      "name": "C3_double_b1",
+      "value": 0.25,              [V07]
+      "phi": 0.2,                 [I07]  and [D07] = "top"
+      "pct": 22.55,               no tag — fixes [S07] = "low"
+      "rarity": 22.55             [R07]  and [Q07] = "ordinary"
+    },
+    {
+      "i": "08",
+      "name": "tau32",
+      "value": 0.66,              [V08]
+      "phi": -0.17,               [I08]  and [D08] = "qcd"
+      "pct": 19.84,               no tag — fixes [S08] = "low"
+      "rarity": 19.84             [R08]  and [Q08] = "ordinary"
+    },
+    {
+      "i": "09",
+      "name": "tau21",
+      "value": 0.55,              [V09]
+      "phi": 0.11,                [I09]  and [D09] = "top"
+      "pct": 39.01,               no tag — fixes [S09] = "mid"
+      "rarity": 39.01             [R09]  and [Q09] = "ordinary"
+    },
+    {
+      "i": "10",
+      "name": "pT",
+      "value": 583.39,            [V10]
+      "phi": -0.06,               [I10]  and [D10] = "qcd"
+      "pct": 40.36,               no tag — fixes [S10] = "mid"
+      "rarity": 40.36             [R10]  and [Q10] = "ordinary"
+    }
+  ]
+}
+
+--- EXPLANATION (what the writer produced) ---
+
+The tagger assigned this jet to the **top** class with a score of **1.67**, placing it above **15 %** of the jets that were also classified as top.
+
+The interpretable decomposition reproduces a score of **1.3**. Because **68** of the jets are reconstructed less closely than this one, the reconstruction is **better** than typical. The baseline that all contributions are added to is **-0.95**.
+
+The strongest contributor is **D2_double_b1**, whose measured value of **1.45** (the energy‑correlation ratio D2) lies in the low‑region that favors a two‑pronged pattern. This value is at the **low** end of the distribution for the qcd class, and its rarity **9.3** makes it **unusual**. Its positive contribution **1.3** pushes the score toward the chosen **top** class.
+
+Next, the ungroomed jet mass **m** is **144.8 GeV**, consistent with the mass of a hadronically decaying top quark. Among qcd jets this sits in the **high** part of the spectrum and is **ordinary** in rarity (**12.59**). Its contribution **1.07** also favors **top**.
+
+The constituent multiplicity **n_const** is **61.0**, reflecting a relatively large number of particles in the jet. This value is **high** for qcd jets and its rarity **15.45** is **ordinary**. Because the contribution is negative (**-0.82**) it pushes toward the opposite **qcd** class.
+
+The generalized correlator **N3_b1** measures **1.35**; low values would favor a three‑pronged structure, and this sits in the **low** part of the qcd distribution. Its rarity **2.5** is **unusual**, and the modest positive contribution **0.55** nudges the score toward **top**.
+
+The soft‑drop mass **m_SD** is **134.45 GeV**, the groomed jet mass after removing soft radiation. It lies in the **high** region for qcd jets and is **ordinary** in rarity (**11.84**). Its positive term **0.35** also pushes toward **top**.
+
+The remaining observables contribute as follows:
+
+- **C2_double_b1** has a value of **0.2**; its negative contribution **-0.29** points toward **qcd**.
+- **C3_double_b1** measures **0.25** with a small positive term **0.2**, supporting **top**.
+- **tau32** is **0.66**; the negative contribution **-0.17** leans toward **qcd**.
+- **tau21** is **0.55**; its slight positive term **0.11** favors **top**.
+- The transverse momentum **pT** is **583.39 GeV** with a tiny negative contribution **-0.06**, nudging toward **qcd**.
+
+Overall, the decomposition shows that the largest positive contributions from D2_double_b1, mass, N3_b1 and soft‑drop mass drive the jet toward the top classification, while a few negative terms from multiplicity, C2_double_b1 and tau32 slightly oppose it.

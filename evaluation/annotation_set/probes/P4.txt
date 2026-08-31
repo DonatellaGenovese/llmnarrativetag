@@ -1,0 +1,25 @@
+The tagger assigned this jet to the **top** class with a score of 4.1, which places it above 49 % of the jets that were also labelled top. 
+
+The interpretable decomposition reproduces a score of 3.53; because the reconstruction percentile is 54, the jet is reconstructed better than most jets of the same decision.
+
+Starting from the baseline of -0.95, each observable contributes as follows. 
+
+The ungroomed jet mass (**m**) is measured at 189.71 GeV. Its contribution of 2.27 pushes the score towards the chosen class (top), the value lies in the high‑end of the qcd distribution (high), and such a position is considered unusual for qcd jets. 
+
+The constituent multiplicity (**n_const**) is 73.0. With a contribution of -2.07 it pulls the score towards the opposite class (qcd), the value is again in the high‑end of qcd (high), and this is unusual for that class. 
+
+The energy‑correlation ratio C2 (**C2_double_b1**) is 0.27. Its positive contribution 1.52 favours top (top), the value sits high in the qcd sample (high), and it is unusual for qcd jets. 
+
+The energy‑correlation ratio D2 (**D2_double_b1**) measures 1.37. Its contribution 1.48 points to top (top), the value is in the low‑end of the qcd distribution (low), and this is unusual for qcd jets. 
+
+The generalized correlator N3 (**N3_b1**) is 1.23. Contributing 0.93 toward top (top), its value lies in the very low region of qcd (low) and is deemed extreme for that class. 
+
+The three‑subjettiness ratio (**tau32**) is 0.46 with a contribution of 0.7, nudging the score toward top. 
+
+The three‑point energy‑correlation ratio (**C3_double_b1**) is 0.32 and contributes -0.23, pulling toward qcd. 
+
+The jet transverse momentum (**pT**) is 568.2 GeV with a small negative contribution -0.12, also favouring qcd. 
+
+The two‑subjettiness ratio (**tau21**) is 0.51 and adds 0.12 towards top. 
+
+Finally, the soft‑drop mass (**m_SD**) is 189.71 GeV, contributing -0.11, which pushes the reconstruction toward qcd.

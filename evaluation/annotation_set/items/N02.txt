@@ -1,0 +1,108 @@
+ITEM N02
+========
+
+--- XAI OUTPUT (what the writer was given; see FIELDS.txt) ---
+    the tag on the right is where that field appears in the text
+
+{
+  "schema_version": 2,
+  "jet_id": 177026,
+  "decision": "qcd",              no tag — appears in prose, and inside [D..]
+  "other_class": "top",           no tag — but pct, rarity, [S..] and [Q..] are all
+                                  measured against THIS class, never the chosen one
+  "score_tagger": 8.88,           [Z]
+  "score_pct": 77,                [ZP]
+  "score_reconstructed": 10.33,   [G]
+  "recon_pct": 16,                [GP]   and [GQ] = "worse"
+  "intercept": 0.95,              [B]
+  "features": [
+    {
+      "i": "01",
+      "name": "D2_double_b1",
+      "value": 9.13,              [V01]
+      "phi": 3.61,                [I01]  and [D01] = "qcd"
+      "pct": 99.99,               no tag — fixes [S01] = "high"
+      "rarity": 0.01              [R01]  and [Q01] = "extreme"
+    },
+    {
+      "i": "02",
+      "name": "m",
+      "value": 37.02,             [V02]
+      "phi": 2.61,                [I02]  and [D02] = "qcd"
+      "pct": 0.01,                no tag — fixes [S02] = "low"
+      "rarity": 0.01              [R02]  and [Q02] = "extreme"
+    },
+    {
+      "i": "03",
+      "name": "C2_double_b1",
+      "value": 0.14,              [V03]
+      "phi": 2.4,                 [I03]  and [D03] = "qcd"
+      "pct": 0.81,                no tag — fixes [S03] = "low"
+      "rarity": 0.81              [R03]  and [Q03] = "extreme"
+    },
+    {
+      "i": "04",
+      "name": "n_const",
+      "value": 17.0,              [V04]
+      "phi": -0.93,               [I04]  and [D04] = "top"
+      "pct": 0.01,                no tag — fixes [S04] = "low"
+      "rarity": 0.01              [R04]  and [Q04] = "extreme"
+    },
+    {
+      "i": "05",
+      "name": "N3_b1",
+      "value": 4.35,              [V05]
+      "phi": 0.91,                [I05]  and [D05] = "qcd"
+      "pct": 99.99,               no tag — fixes [S05] = "high"
+      "rarity": 0.01              [R05]  and [Q05] = "extreme"
+    },
+    {
+      "i": "06",
+      "name": "tau32",
+      "value": 0.79,              [V06]
+      "phi": 0.53,                [I06]  and [D06] = "qcd"
+      "pct": 96.83,               no tag — fixes [S06] = "high"
+      "rarity": 3.17              [R06]  and [Q06] = "unusual"
+    },
+    {
+      "i": "07",
+      "name": "C3_double_b1",
+      "value": 0.36,              [V07]
+      "phi": 0.45,                [I07]  and [D07] = "qcd"
+      "pct": 95.03,               no tag — fixes [S07] = "high"
+      "rarity": 4.97              [R07]  and [Q07] = "unusual"
+    },
+    {
+      "i": "08",
+      "name": "pT",
+      "value": 638.56,            [V08]
+      "phi": -0.21,               [I08]  and [D08] = "top"
+      "pct": 90.71,               no tag — fixes [S08] = "high"
+      "rarity": 9.29              [R08]  and [Q08] = "unusual"
+    },
+    {
+      "i": "09",
+      "name": "m_SD",
+      "value": 0.45,              [V09]
+      "phi": 0.13,                [I09]  and [D09] = "qcd"
+      "pct": 0.01,                no tag — fixes [S09] = "low"
+      "rarity": 0.01              [R09]  and [Q09] = "extreme"
+    },
+    {
+      "i": "10",
+      "name": "tau21",
+      "value": 0.48,              [V10]
+      "phi": -0.13,               [I10]  and [D10] = "top"
+      "pct": 36.46,               no tag — fixes [S10] = "mid"
+      "rarity": 36.46             [R10]  and [Q10] = "ordinary"
+    }
+  ]
+}
+
+--- EXPLANATION (what the writer produced) ---
+
+The decomposition does not fully account for this jet's classification. The tagger assigned it to the qcd class with a score of 8.88, placing it above 77% of same-class jets. The reconstruction reproduces a score of 10.33, and with a recon_pct of 16 this jet is reconstructed worse than most. Starting from a baseline of 0.95, the leading contributions are as follows.
+
+The largest push comes from D2_double_b1, contributing 3.61 toward qcd. Its value of 9.13 sits at the top of the top-class range (high) and is 0.01 extreme for that class. Jet mass follows with 2.61 toward qcd; at 37.02 GeV it sits at the bottom of the top-class range (low) and is 0.01 extreme. C2_double_b1 adds 2.4 toward qcd, with a value of 0.14 that is low and 0.81 extreme for top jets. Constituent multiplicity opposes the decision, contributing -0.93 toward top; its value of 17.0 is low and 0.01 extreme for top jets. N3_b1 contributes 0.91 toward qcd, with a value of 4.35 that is high and 0.01 extreme for top jets.
+
+Among the remaining observables, tau32 contributes 0.53 toward qcd with a value of 0.79; C3_double_b1 contributes 0.45 toward qcd with a value of 0.36; pT contributes -0.21 toward top with a value of 638.56 GeV; m_SD contributes 0.13 toward qcd with a value of 0.45 GeV; and tau21 contributes -0.13 toward top with a value of 0.48.

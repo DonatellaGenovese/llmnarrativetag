@@ -1,0 +1,116 @@
+ITEM N03
+========
+
+--- XAI OUTPUT (what the writer was given; see FIELDS.txt) ---
+    the tag on the right is where that field appears in the text
+
+{
+  "schema_version": 2,
+  "jet_id": 310745,
+  "decision": "top",              no tag — appears in prose, and inside [D..]
+  "other_class": "qcd",           no tag — but pct, rarity, [S..] and [Q..] are all
+                                  measured against THIS class, never the chosen one
+  "score_tagger": 5.01,           [Z]
+  "score_pct": 65,                [ZP]
+  "score_reconstructed": 3.81,    [G]
+  "recon_pct": 23,                [GP]   and [GQ] = "worse"
+  "intercept": -0.95,             [B]
+  "features": [
+    {
+      "i": "01",
+      "name": "C2_double_b1",
+      "value": 0.32,              [V01]
+      "phi": 3.24,                [I01]  and [D01] = "top"
+      "pct": 99.03,               no tag — fixes [S01] = "high"
+      "rarity": 0.97              [R01]  and [Q01] = "extreme"
+    },
+    {
+      "i": "02",
+      "name": "m",
+      "value": 237.52,            [V02]
+      "phi": 1.88,                [I02]  and [D02] = "top"
+      "pct": 98.96,               no tag — fixes [S02] = "high"
+      "rarity": 1.04              [R02]  and [Q02] = "extreme"
+    },
+    {
+      "i": "03",
+      "name": "D2_double_b1",
+      "value": 1.33,              [V03]
+      "phi": 1.58,                [I03]  and [D03] = "top"
+      "pct": 6.83,                no tag — fixes [S03] = "low"
+      "rarity": 6.83              [R03]  and [Q03] = "unusual"
+    },
+    {
+      "i": "04",
+      "name": "n_const",
+      "value": 68.0,              [V04]
+      "phi": -1.56,               [I04]  and [D04] = "qcd"
+      "pct": 90.57,               no tag — fixes [S04] = "high"
+      "rarity": 9.43              [R04]  and [Q04] = "unusual"
+    },
+    {
+      "i": "05",
+      "name": "m_SD",
+      "value": 229.67,            [V05]
+      "phi": -1.27,               [I05]  and [D05] = "qcd"
+      "pct": 98.72,               no tag — fixes [S05] = "high"
+      "rarity": 1.28              [R05]  and [Q05] = "extreme"
+    },
+    {
+      "i": "06",
+      "name": "N3_b1",
+      "value": 1.29,              [V06]
+      "phi": 0.79,                [I06]  and [D06] = "top"
+      "pct": 0.95,                no tag — fixes [S06] = "low"
+      "rarity": 0.95              [R06]  and [Q06] = "extreme"
+    },
+    {
+      "i": "07",
+      "name": "tau32",
+      "value": 0.49,              [V07]
+      "phi": 0.64,                [I07]  and [D07] = "top"
+      "pct": 2.28,                no tag — fixes [S07] = "low"
+      "rarity": 2.28              [R07]  and [Q07] = "unusual"
+    },
+    {
+      "i": "08",
+      "name": "C3_double_b1",
+      "value": 0.35,              [V08]
+      "phi": -0.4,                [I08]  and [D08] = "qcd"
+      "pct": 83.21,               no tag — fixes [S08] = "high"
+      "rarity": 16.79             [R08]  and [Q08] = "ordinary"
+    },
+    {
+      "i": "09",
+      "name": "pT",
+      "value": 576.16,            [V09]
+      "phi": -0.1,                [I09]  and [D09] = "qcd"
+      "pct": 32.44,               no tag — fixes [S09] = "mid"
+      "rarity": 32.44             [R09]  and [Q09] = "ordinary"
+    },
+    {
+      "i": "10",
+      "name": "tau21",
+      "value": 0.65,              [V10]
+      "phi": -0.03,               [I10]  and [D10] = "qcd"
+      "pct": 60.37,               no tag — fixes [S10] = "mid"
+      "rarity": 39.63             [R10]  and [Q10] = "ordinary"
+    }
+  ]
+}
+
+--- EXPLANATION (what the writer produced) ---
+
+The decomposition does not fully account for this decision. The tagger assigned this jet to the top class with a score of [Z]5.01[/Z], sitting above [ZP]65[/ZP] percent of jets assigned to the same class. The decomposition reproduces this score as a reconstructed score of [G]3.81[/G], with this jet being reconstructed worse than most, sitting at [GP]23[/GP] percent on [GQ]worse[/GQ] reconstruction. These add onto a baseline intercept of [B]-0.95[/B].
+
+The leading observable C2_double_b1 measures the energy correlation ratio C2, where low values favour two-pronged structure. It has a measured value of [V01]0.32[/V01] and contributes a score of [I01]3.24[/I01] pushing towards [D01]top[/D01]. This value sits at [S01]high[/S01] within the qcd class, with an extreme rarity of [R01]0.97[/R01] percent, which is [Q01]extreme[/Q01]. 
+
+The second observable m measures ungroomed jet mass, with the mass concentrating near the top mass. It has a measured value of [V02]237.52[/V02] GeV and contributes a score of [I02]1.88[/I02] pushing towards [D02]top[/D02]. This value sits at [S02]high[/S02] within the qcd class, with an extreme rarity of [R02]1.04[/R02] percent, which is [Q02]extreme[/Q02]. 
+
+The third observable D2_double_b1 measures the energy correlation ratio D2, where low values favour two prongs specifically. It has a measured value of [V03]1.33[/V03] and contributes a score of [I03]1.58[/I03] pushing towards [D03]top[/D03]. This value sits at [S03]low[/S03] within the qcd class, with a rarity of [R03]6.83[/R03] percent, which is [Q03]unusual[/Q03]. 
+
+The fourth observable n_const measures constituent multiplicity, growing with the amount of radiation and hard partons. It has a measured value of [V04]68.0[/V04] and contributes a score of [I04]-1.56[/I04] pushing towards [D04]qcd[/D04]. This value sits at [S04]high[/S04] within the qcd class, with a rarity of [R04]9.43[/R04] percent, which is [Q04]unusual[/Q04]. 
+
+The fifth observable m_SD measures soft-drop mass, where only the hard core survives. It has a measured value of [V05]229.67[/V05] GeV and contributes a score of [I05]-1.27[/I05] pushing towards [D05]qcd[/D05]. This value sits at [S05]high[/S05] within the qcd class, with an extreme rarity of [R05]1.28[/R05] percent, which is [Q05]extreme[/Q05]. 
+
+The remaining observables follow with their contributions and measured values. N3_b1 measures generalized correlator N3, where low values favour three-pronged structure, yielding a value of [V06]1.29[/V06] and a contribution of [I06]0.79[/I06]. tau32 measures the N-subjettiness ratio tau3/tau2 where low values indicate three resolved prongs, yielding a value of [V07]0.49[/V07] and a contribution of [I07]0.64[/I07]. C3_double_b1 measures energy correlation ratio C3 where low values favour a third resolved energy centre, yielding a value of [V08]0.35[/V08] and a contribution of [I08]-0.4[/I08]. pT measures jet transverse momentum setting the scale of the jet, yielding a value of [V09]576.16[/V09] GeV and a contribution of [I09]-0.1[/I09]. Finally, tau21 measures the N-subjettiness ratio tau2/tau1 where low values indicate a genuinely two-pronged jet, yielding a value of [V10]0.65[/V10] and a contribution of [I10]-0.03[/I10].

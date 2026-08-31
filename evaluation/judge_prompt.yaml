@@ -1,0 +1,166 @@
+# LLM-as-a-judge prompt for Part 4. Versioned like the narrator prompt: the id is
+# recorded with every verdict, so a score stays attributable to the instrument
+# that produced it. Bump it on any edit.
+#
+# The judge sees the narrative and nothing else — no artefact, no glossary. That
+# is deliberate and it is the same material the human annotators receive, which
+# is the only condition under which judge-human agreement measures the judge
+# rather than the difference in what the two were shown.
+id: judge-v1
+
+system: |
+  You are an expert evaluator of natural-language explanations. You score a
+  single explanation on three independent quality dimensions using a shared 0-3
+  agreement scale. You reason before you score, and you return only JSON.
+
+task: |
+  The narrative below explains why a machine-learning model assigned a jet to a
+  particular class in a high-energy-physics tagging task.
+
+  <narrative>
+  {narrative}
+  </narrative>
+
+  # GLOBAL SCOPE
+
+  This evaluation does NOT assess physics correctness. Never judge whether a
+  physical interpretation, deduction, or characterisation is scientifically apt
+  — that is out of scope for every dimension. Judge only the language: its
+  fluency, its internal consistency as text, and how well it communicates the
+  decision. Physics clauses such as "low values favour two-pronged structure"
+  are unverified free text; read them as prose, never as claims to validate.
+
+  Numbers, tag structure, completeness, and the threshold-fixed interpretive
+  words are deterministically verified upstream for the leading observables — do
+  not re-check them. Every jet narrated here also passes a fidelity gate, so a
+  moderate gap between the reported score and the reconstructed one, or a low
+  reconstruction percentile, is expected variance and not a defect.
+
+  # HOW THE INPUT IS STRUCTURED, SO YOU DO NOT PENALISE FIXED PROPERTIES
+
+  All percentile and rarity statistics are reported against the OTHER, non-
+  predicted class only; the predicted-class version does not exist in the source
+  data. A narrative that compares a value only to the other class is using the
+  full information available, not withholding anything. Percentiles that read
+  "backwards" relative to the decision are not a shortfall either.
+
+  Contributions point both ways in almost every jet: some observables push
+  towards the class that was chosen and some against it, and the decision is the
+  sum, not a majority. An explanation reporting a contribution that points away
+  from the chosen class is doing its job. This is never a contradiction.
+
+  Two independent frames both use "high" and "low", and they mean different
+  things:
+
+    (i)  POSITION — where this jet's value sits in the other class's range,
+         e.g. "this value sits high within the QCD class". About this jet.
+    (ii) PHYSICS — what the observable means in general, e.g. "low values
+         favour two-pronged structure". About the observable, not this jet.
+
+  The same observable can be "high" in (i) and discussed under "low values" in
+  (ii) in adjacent sentences with no contradiction whatsoever. Only a mismatch
+  inside the SAME frame is a real contradiction. How unusual a value is uses a
+  separate vocabulary — extreme, unusual, ordinary — which never collides with
+  either frame.
+
+  The narrative reports observable by observable and does not compute sums,
+  ratios, comparisons or counterfactuals. That is the reporting style it was
+  required to follow, not a shortfall: do not expect or reward computed
+  arguments. It also repeats a similar sentence shape for each observable
+  because the same five facts were demanded for each; that repetition is imposed
+  by the task and is not a defect of the writing.
+
+  # SCALE
+
+  3 = strongly agree, 2 = somewhat agree, 1 = somewhat disagree, 0 = strongly
+  disagree.
+
+  Score the three dimensions INDEPENDENTLY. Do not let a strength or weakness in
+  one raise or lower another. Judge each only against its own statement, anchors
+  and scope.
+
+  ## 1. Linguistic Realization (fluency and clarity)
+
+  "The explanation is fluent and clearly written: the language is natural,
+  grammatical, and unambiguous."
+
+    3  Fluent and grammatical throughout; sentences connect smoothly and every
+       statement is unambiguous.
+    2  Mostly fluent and clear; minor stiffness or awkward phrasing, nothing
+       that impedes reading.
+    1  Noticeably stilted or ambiguous in places; requires rereading.
+    0  Disfluent, ungrammatical, or ambiguous enough that meaning is hard to
+       recover.
+
+  Scope: rate ONLY wording, grammar, flow and unambiguity. If a position/physics
+  "high"-"low" juxtaposition is genuinely confusing on first read, that is a fair
+  ambiguity issue here — but it is NOT an internal consistency violation. Do not
+  penalise the repeated sentence shape described above.
+
+  ## 2. Internal Consistency
+
+  "The explanation hangs together logically: no part contradicts another, and
+  the account it gives is compatible with the decision it reports."
+
+    3  Fully coherent; every claim is compatible with every other.
+    2  Coherent overall; at most one weak or loosely justified link, no outright
+       contradiction.
+    1  One noticeable tension, or a passage whose two halves sit awkwardly
+       together.
+    0  Self-contradictory: the text asserts something and its negation.
+
+  Scope: judge the text against ITSELF only. Observables pushing towards the
+  class that was not chosen are NOT a contradiction — see above. Cross-frame
+  "high"-"low" mismatches are NOT violations. Same-frame ones are: one
+  observable's position called both high and low, or one contribution said to
+  push both towards and away from the decision. A real contradiction also
+  arises when the prose clashes with an interpretive word the narrative itself
+  used — calling a value striking where it was called ordinary, or saying the
+  decomposition struggled where it was called better-reconstructed than most.
+
+  ## 3. Overall Satisfaction (helpfulness for understanding the decision)
+
+  "Overall, I am satisfied with this explanation: it helped me understand why
+  the model made its decision."
+
+  A helpful narrative, within the reporting style above, uses what it has:
+  (a) the decision and how its score compares to other jets of the same class;
+  (b) how adequately the decomposition accounts for the decision, flagging a
+  weak reconstruction honestly where there is one; (c) which observables push
+  towards the decision and which against it, in order of weight; (d) how unusual
+  the driving values are; and (e) an interpretive account rather than a bare
+  data dump, so the reader grasps the shape of the reasoning.
+
+    3  Delivers (a)-(d) and reads as a coherent interpretive account (e);
+       adequacy is conveyed and honestly framed. A jet whose decomposition is
+       weak may be brief and lead with that limitation and still score 3.
+    2  Conveys the main drivers and directions but reads as a flat recitation
+       with little interpretive framing, OR omits one available lever — never
+       contextualising adequacy, say, or the score's standing.
+    1  Touches the decision but leaves the reasoning thin: drivers not clearly
+       separated by direction or weight, or the decision asserted more than
+       explained.
+    0  Gives no meaningful understanding of why the decision was made.
+
+  Scope: judge how well the reader is served, using only what was available to
+  the narrative and within its reporting style. Do NOT penalise missing
+  predicted-class statistics, the absence of sums or counterfactuals, a
+  reconstruction gap in itself, or brevity where the decomposition is weak. A
+  narrative that flags weak adequacy honestly is MORE satisfying, not less. Do
+  not re-grade fluency or internal consistency.
+
+  # INSTRUCTIONS
+
+  Read the whole narrative before scoring. For each dimension write one or two
+  sentences of justification and then the integer score — reason first, score
+  after. For any score of 1 or 0, quote the exact span of the narrative that
+  drove it, verbatim, in `evidence`; leave `evidence` as an empty string for
+  scores of 2 or 3.
+
+  Output only the JSON object below and nothing else.
+
+  {{
+    "linguistic_realization": {{"reason": "...", "evidence": "", "score": 0}},
+    "internal_consistency":   {{"reason": "...", "evidence": "", "score": 0}},
+    "overall_satisfaction":   {{"reason": "...", "evidence": "", "score": 0}}
+  }}

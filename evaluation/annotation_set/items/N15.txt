@@ -1,0 +1,116 @@
+ITEM N15
+========
+
+--- XAI OUTPUT (what the writer was given; see FIELDS.txt) ---
+    the tag on the right is where that field appears in the text
+
+{
+  "schema_version": 2,
+  "jet_id": 208697,
+  "decision": "qcd",              no tag — appears in prose, and inside [D..]
+  "other_class": "top",           no tag — but pct, rarity, [S..] and [Q..] are all
+                                  measured against THIS class, never the chosen one
+  "score_tagger": 6.97,           [Z]
+  "score_pct": 50,                [ZP]
+  "score_reconstructed": 7.05,    [G]
+  "recon_pct": 93,                [GP]   and [GQ] = "better"
+  "intercept": 0.95,              [B]
+  "features": [
+    {
+      "i": "01",
+      "name": "m",
+      "value": 83.02,             [V01]
+      "phi": 3.39,                [I01]  and [D01] = "qcd"
+      "pct": 0.01,                no tag — fixes [S01] = "low"
+      "rarity": 0.01              [R01]  and [Q01] = "extreme"
+    },
+    {
+      "i": "02",
+      "name": "D2_double_b1",
+      "value": 4.48,              [V02]
+      "phi": 1.94,                [I02]  and [D02] = "qcd"
+      "pct": 99.99,               no tag — fixes [S02] = "high"
+      "rarity": 0.01              [R02]  and [Q02] = "extreme"
+    },
+    {
+      "i": "03",
+      "name": "n_const",
+      "value": 35.0,              [V03]
+      "phi": -1.11,               [I03]  and [D03] = "top"
+      "pct": 5.26,                no tag — fixes [S03] = "low"
+      "rarity": 5.26              [R03]  and [Q03] = "unusual"
+    },
+    {
+      "i": "04",
+      "name": "N3_b1",
+      "value": 2.98,              [V04]
+      "phi": 0.9,                 [I04]  and [D04] = "qcd"
+      "pct": 99.99,               no tag — fixes [S04] = "high"
+      "rarity": 0.01              [R04]  and [Q04] = "extreme"
+    },
+    {
+      "i": "05",
+      "name": "C2_double_b1",
+      "value": 0.24,              [V05]
+      "phi": -0.74,               [I05]  and [D05] = "top"
+      "pct": 52.31,               no tag — fixes [S05] = "mid"
+      "rarity": 47.69             [R05]  and [Q05] = "ordinary"
+    },
+    {
+      "i": "06",
+      "name": "m_SD",
+      "value": 12.72,             [V06]
+      "phi": 0.66,                [I06]  and [D06] = "qcd"
+      "pct": 0.1,                 no tag — fixes [S06] = "low"
+      "rarity": 0.1               [R06]  and [Q06] = "extreme"
+    },
+    {
+      "i": "07",
+      "name": "C3_double_b1",
+      "value": 0.37,              [V07]
+      "phi": 0.57,                [I07]  and [D07] = "qcd"
+      "pct": 97.36,               no tag — fixes [S07] = "high"
+      "rarity": 2.64              [R07]  and [Q07] = "unusual"
+    },
+    {
+      "i": "08",
+      "name": "tau32",
+      "value": 0.68,              [V08]
+      "phi": 0.24,                [I08]  and [D08] = "qcd"
+      "pct": 82.01,               no tag — fixes [S08] = "high"
+      "rarity": 17.99             [R08]  and [Q08] = "ordinary"
+    },
+    {
+      "i": "09",
+      "name": "tau21",
+      "value": 0.72,              [V09]
+      "phi": 0.13,                [I09]  and [D09] = "qcd"
+      "pct": 98.59,               no tag — fixes [S09] = "high"
+      "rarity": 1.41              [R09]  and [Q09] = "extreme"
+    },
+    {
+      "i": "10",
+      "name": "pT",
+      "value": 572.13,            [V10]
+      "phi": 0.11,                [I10]  and [D10] = "qcd"
+      "pct": 26.43,               no tag — fixes [S10] = "mid"
+      "rarity": 26.43             [R10]  and [Q10] = "ordinary"
+    }
+  ]
+}
+
+--- EXPLANATION (what the writer produced) ---
+
+The tagger assigned this jet to the qcd class with a classification score of 6.97, placing it at the 50% mark among same-class jets. The interpretable model reconstructs this score at 7.05, which is a reconstruction performance that is better than most other jets, as 93% of jets are reconstructed less closely than this one. The decomposition builds this reconstructed score starting from a baseline intercept of 0.95.
+
+The leading contribution comes from the ungroomed jet mass, m, which contributes 3.39 pushing towards qcd. Its measured value is 83.02 GeV, representing the invariant mass of the whole jet. This value sits at a low position relative to the top class, and is extreme for that class with a rarity of 0.01%. 
+
+Next, the energy correlation ratio D2_double_b1 contributes 1.94 towards qcd. Its measured value is 4.48, an energy correlation ratio designed to separate two-pronged from one-pronged structures. This value sits at a high position within the top class, making it extreme with a rarity of 0.01%.
+
+The constituent multiplicity, n_const, contributes -1.11 pushing towards top. The jet contains a particle count of 35.0 constituents, reflecting the level of radiation and initiating hard partons. This multiplicity sits at a low position for the top class, which is unusual with a rarity of 5.26%.
+
+The generalized correlator N3_b1 contributes 0.9 towards qcd. Its measured value is 2.98, a ratio of generalized energy correlators where low values favour three-pronged structures. This value sits at a high position within the top class, which is extreme with a rarity of 0.01%.
+
+The energy correlation ratio C2_double_b1 contributes -0.74 towards top. Its measured value is 0.24, a double ratio of energy correlation functions where low values favour two-pronged structures. This value sits at a mid position within the top class, making it ordinary with a rarity of 47.69%.
+
+The remaining observables contribute smaller amounts to the total score. The soft-drop mass, m_SD, contributes 0.66 with a measured value of 12.72 GeV, which represents the jet mass after soft radiation has been groomed away to leave only the hard core. The energy correlation ratio C3_double_b1 contributes 0.57 with a measured value of 0.37, a three-prong analogue of C2 where low values favour a third resolved energy centre. The N-subjettiness ratio tau32 contributes 0.24 with a measured value of 0.68, representing the residual radiation left by describing the jet with three axes relative to two. The N-subjettiness ratio tau21 contributes 0.13 with a measured value of 0.72, which measures the residual radiation left by describing the jet with two axes relative to one. Finally, the jet transverse momentum, pT, contributes 0.11 with a measured value of 572.13 GeV, setting the overall momentum scale of the jet transverse to the beam.
