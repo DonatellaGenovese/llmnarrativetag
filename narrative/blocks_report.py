@@ -92,21 +92,28 @@ def main() -> None:
     repo = Path(__file__).resolve().parents[1]
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--config", type=Path, default=repo / "narrative/configs/narrative_top.yaml")
-    p.add_argument("--blocks", nargs="+", default=["v16", "b1", "b2", "b3", "b4", "b5"],
-                   help="File prefixes to pool; v16 is the original 100-jet sample")
+    p.add_argument("--blocks", nargs="+", default=["v16"],
+                   help="File prefixes to pool; v16 is the 100-jet sample the paper reports")
+    # The extra blocks b1-b5 are kept outside git, in extra_blocks/, so pooling
+    # them with v16 means reading two directories. First match wins.
+    p.add_argument("--runs", type=Path, nargs="+", default=None,
+                   help="Directories to search for <block>_<model>.jsonl "
+                        "(default: the narratives dir from the config)")
     args = p.parse_args()
 
     cfg = yaml.safe_load(args.config.read_text())
     glossary = load_glossary(repo / cfg["glossary"]["path"], require_reviewed=True)
-    runs = repo / cfg["outputs"]["narratives"]
+    run_dirs = args.runs or [repo / cfg["outputs"]["narratives"]]
 
     # model -> block -> {jet_id: verdicts}
     data: Dict[str, Dict[str, dict]] = defaultdict(dict)
     for model in MODELS:
         for blk in args.blocks:
-            f = runs / f"{blk}_{model}.jsonl"
-            if f.exists():
-                data[model][blk] = score_file(f, glossary)
+            for d in run_dirs:
+                f = d / f"{blk}_{model}.jsonl"
+                if f.exists():
+                    data[model][blk] = score_file(f, glossary)
+                    break
 
     present = [b for b in args.blocks if any(b in data[m] for m in MODELS)]
     print(f"blocks pooled: {', '.join(present)}\n")

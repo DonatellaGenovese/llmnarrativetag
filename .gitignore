@@ -38,6 +38,11 @@ surrogate/outputs/
 narrative/outputs/
 !narrative/outputs/top/narratives/run100_jets.json
 
+# The five extra blocks b1-b5 and the script that produced them. The paper
+# reports the v16 block alone, so these are kept on disk to rebuild the pooled
+# frame if it is ever wanted, and deliberately not published.
+extra_blocks/
+
 # Judge sweep bookkeeping: resume markers and run logs, not results.
 evaluation/.judges.done
 evaluation/.judges.lock

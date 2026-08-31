@@ -121,7 +121,6 @@ narrative/
   verifier.py                  tag extraction, equality, completeness, bare-number sieve
   orchestrator.py              abstention gate → generate → verify → retry
   blocks_report.py             the pass-rate table, re-verifying every narrative
-  inspect.py                   renders a run as artefact-beside-prose, for reading
   outputs/top/                 reference stats and narratives (local, not tracked)
 ```
 
@@ -168,37 +167,38 @@ python -m narrative.orchestrator \
 python -m narrative.blocks_report --blocks scratch
 ```
 
-A sweep is that last pair looped over models, which is what
-[`run_blocks.sh`](run_blocks.sh) does over five blocks and four generators. It
-is safe to re-run: a complete (block, model) pair is skipped, a partial file is
-deleted and redone. Twenty runs take hours and are worth detaching:
+`blocks_report.py` **re-verifies every narrative** rather than trusting the
+`violations` field each run recorded. That field was written by whatever
+verifier was on disk at the time and it has drifted, so a rate must be computed
+under one contract. Running it with no arguments scores the v16 block and
+reproduces the paper's pass-rate table.
 
-```bash
-setsid nohup ./run_blocks.sh </dev/null >/dev/null 2>&1 &
-```
-
-Then pool. `blocks_report.py` **re-verifies every narrative** rather than
-trusting the `violations` field each run recorded, since blocks generated weeks
-apart were scored by whatever verifier was on disk at the time and a pooled
-rate must come from one contract:
-
-```bash
-python -m narrative.blocks_report                    # defaults to v16 b1..b5
-python -m narrative.blocks_report --blocks b1 b2
-```
-
-It prints pooled per-family rates with Wilson intervals, the same rates inside
-each block — which answers "is 100 jets enough?" by showing the spread rather
-than arguing about it — and exact McNemar tests over the shared jets.
+It prints per-family rates with Wilson intervals, the same rates inside each
+block, and exact McNemar tests over the shared jets.
 
 ### What is on disk
 
-Six blocks of 100 jets, four generators each, all from prompt `top-v16`:
-`v16` (seed 2, `run100_jets.json`) and `b1`–`b5` (seeds 3–7). 600 distinct jets
-with no overlap, of which **553 were narrated by all four models** and form the
-paired frame. The prefix names the *block*, not the prompt version — `v16_*` is
-named after the prompt only because it predates the block scheme. **Read
-`prompt_id` out of the file rather than inferring it from the name.**
+**The paper's run is the `v16` block alone**: 100 jets drawn at seed 2 into
+`run100_jets.json`, of which the gate withholds 10, leaving 90 narrated by each
+of the four generators. That sample file is the one thing under `outputs/` that
+is tracked — a result is not reproducible without knowing which jets it covered.
+
+Five further blocks `b1`–`b5` (seeds 3–7) exist and are **deliberately not in
+git**. They live in `extra_blocks/`, together with the `run_blocks.sh` that
+produced them, because nothing in the paper rests on them: pooled with `v16`
+they give 600 distinct jets, 553 narrated by all four models, and a paired frame
+whose rates differ from the reported ones. Keeping them out of the repo keeps
+the published material unambiguous. To rebuild that frame:
+
+```bash
+python -m narrative.blocks_report \
+    --runs narrative/outputs/top/narratives extra_blocks \
+    --blocks v16 b1 b2 b3 b4 b5
+```
+
+The prefix names the *block*, not the prompt version — `v16_*` is named after
+the prompt only because it predates the block scheme. **Read `prompt_id` out of
+the file rather than inferring it from the name.**
 
 Superseded runs are gzipped under `narratives/archive/`: `top-v7`, prompt
 versions `v8`–`v15`, and the rejected ablation arms `v17`–`v19`. Two traps
