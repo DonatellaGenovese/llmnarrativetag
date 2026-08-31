@@ -66,7 +66,7 @@ narrative generation and evaluation, one directory per stage of the pipeline:
 - `evaluation/judge_report.py`: verdicts to spreadsheet, and `--by-model` the per-generator table.
 - `evaluation/agreement.py`: human-judge agreement, weighted kappa, negative recall.
 - `evaluation/annotation_set/`: the set itself — the twenty items exactly as handed out, and `KEY.csv`, the provenance the annotators never saw.
-- `evaluation/results/`: everything that came back or was derived — the judge's verdicts, the two annotator sheets, the scored spreadsheets — plus the instructions and the tagged copies of the items.
+- `evaluation/results/`: everything that came back — the judge's verdicts, the two annotator sheets, the scored spreadsheets, and the tagged copies of the items.
 - `run_judges.sh`: scores a whole block with the judge; resumable, holds a lock.
 - `particle_transformer/`: the upstream ParT toolkit, vendored (see the last section).
 
@@ -182,12 +182,16 @@ python -m evaluation.agreement                 # human ↔ judge tables (--latex
 ```
 
 `annotation_set/` holds only what defines the set: the twenty items as the
-annotators and the judge received them, and `KEY.csv` mapping each id back to
-its generator and jet. Everything a run produced or consumed alongside it —
-verdicts, sheets, instructions, tagged copies — is in `results/`, so the set
-itself cannot drift from what was handed out. The annotator sheets are
-`annotator_1.csv` and `annotator_2.csv`; sheet order fixes which is A and which
-is B in the tables.
+annotators received them, and `KEY.csv` mapping each id back to its generator
+and jet. Everything a run produced is in `results/`, so the set itself cannot
+drift from what was handed out. The annotator sheets are `annotator_1.csv` and
+`annotator_2.csv`; sheet order fixes which is A and which is B in the tables.
+
+The handout also included a field legend, the observable glossary and the
+narrator's prompt. Those are not kept as files: `make_annotation_set.py`
+regenerates all three into `--aux` from `narrative/prompts/prompt_top.yaml`,
+`narrative/configs/glossary_top.yaml` and its own legend constant, and a
+committed copy would only be a duplicate that can fall out of date.
 
 ## Results
 
