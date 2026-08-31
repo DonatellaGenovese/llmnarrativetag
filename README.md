@@ -26,9 +26,14 @@ scripts/              ParT teacher inference / logit dumping
 particle_transformer/ Vendored ParT training toolkit (see the last section)
 ```
 
-Everything below assumes `conda activate part-surrogate` and
-`export PYTHONPATH="$PWD"` from the repo root, except the ParT inference steps,
-which use the torch venv (`source .venv/bin/activate`).
+**Where to run what.** Parts 3 and 4 run from the repo root. Parts 1 and 2 run
+from **`particle_transformer/`**, because that is where the datasets, the
+teacher checkpoints and the weaver configs live: the symlinks under
+`particle_transformer/surrogate/` assemble this repo's real code into the
+package layout the ParT scripts expect, and `surrogate.build_features_top` and
+`surrogate.fjcontrib_loader` resolve there and nowhere else. Everything assumes
+`conda activate part-surrogate`, except the ParT inference steps, which use the
+torch venv (`source .venv/bin/activate`).
 
 ---
 
@@ -77,6 +82,8 @@ instead of on `t` gain only +0.4 points of accuracy for the EBM
 rather than relearning the physics from scratch.
 
 ```bash
+cd particle_transformer            # see "Where to run what" above
+
 # 1) ParT teacher logits (torch venv)
 source .venv/bin/activate
 ./dump_toplandscape_train_val_logits.sh     # val then train; test already exists
@@ -353,7 +360,11 @@ not to tidy.
 
 The symlinks inside `particle_transformer/surrogate/` point back at this repo's
 real code, so the ParT scripts resolve the paths they expect without a second
-copy of anything.
+copy of anything. They are load-bearing, not a convenience: `surrogate/` at the
+repo root holds only the model fitting, while the feature building and the
+fastjet loader live under `data/observables/`, and it is the symlink tree that
+puts both in one importable package. Run Part 2 from the repo root and the
+imports fail.
 
 **Quark/gluon tagging is out of scope.** The QuarkGluon basis and runs were
 removed; the vendored upstream files that mention QuarkGluon are left as they
