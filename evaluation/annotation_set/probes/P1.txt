@@ -1,1 +1,0 @@
-The tagger assigned this jet to the top class, with a score of 4.1.

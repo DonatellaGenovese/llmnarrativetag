@@ -59,11 +59,18 @@ ParT is the teacher; an interpretable student is fit to reproduce its logit
 difference `t` rather than the truth label. Three rungs on the same observable
 basis:
 
-| model | role | test R² | Spearman | agreement with ParT |
-|---|---|---|---|---|
-| Ridge (log + z) | additive-linear lower bound | 0.886 | 0.938 | 0.932 |
-| **EBM, 0 interactions** | **the interpretable surrogate** | **0.962** | **0.972** | **0.951** |
-| GBDT (unconstrained) | upper bound, not interpretable | 0.980 | 0.984 | 0.967 |
+| model | role | test R² | ADO vs ParT | agreement | AUC |
+|---|---|---|---|---|---|
+| Ridge (log + z) | additive-linear lower bound | 0.886 | 0.962 | 0.932 | 0.955 |
+| **EBM, 0 interactions** | **the interpretable surrogate** | **0.962** | **0.983** | **0.951** | **0.975** |
+| GBDT (unconstrained) | upper bound, not interpretable | 0.980 | 0.988 | 0.967 | 0.979 |
+| ParT (teacher) | — | — | — | — | 0.983 |
+
+R² and agreement come from `train_surrogates_top.py` and
+`eval_classifier_metrics.py`. **The ADO column comes from `seed_variance.py`
+and from nowhere else** — it is the only place average decision ordering is
+computed, over 500 k fixed signal/background pairs, so it is easy to mistake for
+an accessory analysis and delete.
 
 Fit on train (1.21 M jets), selected on val (403 k), reported on test (404 k).
 The Ridge↔EBM gap is what the linear form misses; the EBM↔GBDT gap is how much
@@ -96,13 +103,17 @@ conda activate part-surrogate
 python -m surrogate.eval_classifier_metrics \
   --predictions surrogate/outputs/top/models/test_predictions.parquet
 
-# 4) label-trained comparison
+# 4) ADO, and how much of each gap is the seed
+python -m surrogate.seed_variance
+
+# 5) label-trained comparison
 ./surrogate/run_label_classifiers.sh
 ```
 
 Feature tables and fitted models land in `surrogate/outputs/top/` and stay
 local. The JSON/TXT numbers they produce are copied into
-[`surrogate/metrics/top/`](surrogate/metrics/top/) and are tracked.
+[`surrogate/metrics/top/`](surrogate/metrics/top/) and are tracked — including
+`seed_variance.json`, which carries the ADO column above.
 
 ## Part 3 — Narrative
 
@@ -305,10 +316,19 @@ no artefact, no glossary — because that is what the human annotators see, and
 their agreement only measures the judge if both were shown the same thing.
 
 ```bash
-./run_judges.sh                     # scores block v16, resumable, holds a lock
-python -m evaluation.judge_report   # → annotation_set/judge_{scores,reasons}.csv
-python -m evaluation.agreement      # human ↔ judge tables (--latex for the paper)
+./run_judges.sh                            # scores block v16, resumable, holds a lock
+python -m evaluation.judge_report          # → annotation_set/judge_{scores,reasons}.csv
+python -m evaluation.judge_report --by-model   # mean ± SD per generator, over all 204
+python -m evaluation.agreement             # human ↔ judge tables (--latex for the paper)
 ```
+
+`--by-model` and the two CSVs cover different populations on purpose. The CSVs
+are the twenty items the annotators scored, where five narratives per generator
+is far too few to rank generators. `--by-model` is every narrative the judge
+saw, where the counts are large enough — but conditional on passing
+verification, so the N run from 9 to 86 and the columns are not comparable
+across models. Printing N beside them is what stops the table reading as a
+ranking.
 
 **The judge is an aggregate baseline, not a substitute for reading a
 narrative.** On the 20-item set it agrees with the annotators on 95% of the
@@ -324,19 +344,19 @@ that reason.
 evaluation/
   judge.py                     the rubric runner
   judge_prompt.yaml            versioned judge prompt
-  judge_report.py              verdicts → spreadsheet, joined on KEY.csv
+  judge_report.py              the spreadsheet, and --by-model the per-generator table
   agreement.py                 human ↔ judge agreement, κ_w, negative recall
   judgments_v16_claude-sonnet-5.jsonl
   annotation_set/
     items/  items_tagged/      the 20 items as handed to annotators, ± tags
-    probes/                    5 hand-written probes with known answers
     KEY.csv                    provenance the annotators do not see
     PROMPT.txt FIELDS.txt GLOSSARY.txt
     human_*.csv                one sheet per annotator
     judge_scores.csv           one row per item, one column per dimension
     judge_reasons.csv          the same verdicts with justification text
-    judge_probes_sonnet.jsonl  probes
     judge_variance_sonnet.jsonl, judge_v1_rerun_sonnet.jsonl
+                               repeat runs of the shipped prompt, `judge-v1`,
+                               measuring the judge's own nondeterminism
 ```
 
 Nothing in the report aggregates over generators: five narratives per generator
