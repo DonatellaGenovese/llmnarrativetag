@@ -1,0 +1,36 @@
+# Environment for Parts 1-4: observables, surrogate, narrative, evaluation.
+#
+# FastJet and fjcontrib come from conda-forge rather than pip: the observables
+# are computed through cppyy against the C++ headers and shared libraries, which
+# fjcontrib_loader.py resolves under sys.prefix — so they have to live inside
+# this environment, not system-wide.
+#
+# ParT inference is NOT here. Torch and weaver conflict with this stack and run
+# in their own venv; see the README.
+#
+#   conda env create -f environment.yml
+#   conda activate part-surrogate
+name: part-surrogate
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy=2.2
+  - pandas=2.3
+  - pyarrow=25.0
+  - pyyaml=6.0
+  - scikit-learn=1.7
+  - xgboost=3.2
+  - cppyy=2.3
+  - fastjet=3.5
+  - fastjet-contrib=1.103
+  - joblib
+  - tqdm
+  - pip
+  - pip:
+      # The EBM. Not on conda-forge at a usable version.
+      - interpret==0.7.8
+      # Narrator and judge backends. The OpenAI-compatible providers
+      # (DeepSeek, Groq, Ollama) are reached over plain urllib, no SDK.
+      - google-genai==2.17.0
+      - anthropic==1.2.0
