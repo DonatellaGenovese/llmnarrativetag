@@ -49,7 +49,7 @@
     }
   },
   "sources": {
-    "surrogate_classifier_metrics": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/models/classifier_metrics.json",
-    "label_metrics": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/models_label/metrics_label.json"
+    "surrogate_classifier_metrics": "surrogate/outputs/top/models/classifier_metrics.json",
+    "label_metrics": "surrogate/outputs/top/models_label/metrics_label.json"
   }
 }

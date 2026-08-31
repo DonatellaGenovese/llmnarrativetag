@@ -7,9 +7,9 @@
     "test": 403999
   },
   "paths": {
-    "train": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_train.parquet",
-    "val": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_val.parquet",
-    "test": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_test.parquet"
+    "train": "surrogate/outputs/top/features/features_train.parquet",
+    "val": "surrogate/outputs/top/features/features_val.parquet",
+    "test": "surrogate/outputs/top/features/features_test.parquet"
   },
   "logistic": {
     "train": {
