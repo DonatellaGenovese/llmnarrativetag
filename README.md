@@ -17,7 +17,7 @@ Teacher: **ParT-FineTune**, target `t = z_top − z_qcd`.
 ```
 data/observables/     Observable definitions and feature building     (Part 1)
 data/configs/         Observable basis + weaver dataloader configs
-surrogate/            Ridge / EBM / GBDT surrogate + audit            (Part 2)
+surrogate/            Ridge / EBM / GBDT surrogate distillation       (Part 2)
   scripts/            Shell entry points
   metrics/top/        JSON/TXT numbers from the official run (tracked)
 narrative/            LLM narrative generation and verification       (Part 3)
@@ -88,7 +88,7 @@ cd particle_transformer            # see "Where to run what" above
 source .venv/bin/activate
 ./dump_toplandscape_train_val_logits.sh     # val then train; test already exists
 
-# 2) features + audit + Ridge/EBM/GBDT
+# 2) features + Ridge/EBM/GBDT
 conda activate part-surrogate
 ./surrogate/run_official_top.sh             # full;  add 5000 for a smoke run
 

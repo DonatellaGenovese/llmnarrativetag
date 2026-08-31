@@ -58,11 +58,6 @@ build_one test "${DATA}/test_file.parquet" \
   "$TEST_PRED" \
   "${OUT}/features/features_test.parquet"
 
-echo "=== Audit (train features) ==="
-python -m surrogate.audit \
-  --features "${OUT}/features/features_train.parquet" \
-  --out-dir "${OUT}/audit"
-
 echo "=== Fit Ridge / EBM / GBDT (official splits) ==="
 extra=()
 if [[ -n "$MAX_JETS" ]]; then
