@@ -8,6 +8,15 @@ __pycache__/
 venv/
 env/
 particle_transformer/env.sh
+
+# Vendored ParT toolkit: datasets, checkpoints and training runs stay local.
+# Scoped to particle_transformer/ on purpose — the bare `models/` pattern also
+# swallowed surrogate/metrics/*/models/, which is exactly what we do track.
+particle_transformer/datasets/
+particle_transformer/models/
+particle_transformer/runs/
+particle_transformer/training/
+particle_transformer/logs/
 particle_transformer/predict_output/
 
 # Large / regenerable artifacts — not tracked in this repo
@@ -17,18 +26,22 @@ particle_transformer/predict_output/
 *.pt
 *.pth
 *.root
-datasets/
-models/
-runs/
-logs/
-training/
+
+# Surrogate: feature tables and fitted models. The JSON/TXT numbers they
+# produce live in surrogate/metrics/ and are tracked.
 surrogate/outputs/
+
 # Narrative runs: one JSONL per model per prompt version, plus derived review
 # text and logs. Regenerable, and they grow with every sweep. The jet sample is
 # the exception: it defines which jets a run covered, so a result is not
 # reproducible without it.
 narrative/outputs/
 !narrative/outputs/top/narratives/run100_jets.json
+
+# Judge sweep bookkeeping: resume markers and run logs, not results.
+evaluation/.judges.done
+evaluation/.judges.lock
+*.log
 
 # OS
 .DS_Store

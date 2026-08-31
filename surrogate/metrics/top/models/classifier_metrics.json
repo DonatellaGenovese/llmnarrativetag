@@ -1,0 +1,117 @@
+{
+  "n": {
+    "train": 1210999,
+    "val": 402999,
+    "test": 403999
+  },
+  "paths": {
+    "train": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_train.parquet",
+    "val": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_val.parquet",
+    "test": "/home/dongen/Desktop/particle_transformer/surrogate/outputs/top/features/features_test.parquet"
+  },
+  "train": {
+    "ridge": {
+      "mae_score_vs_part": 0.07611692656799735,
+      "rmse_score_vs_part": 0.16549346402730697,
+      "agreement_with_part": 0.9319247992772909,
+      "acc_vs_truth": 0.9004549136704489,
+      "auc_vs_truth": 0.9552516654781823,
+      "part_acc_vs_truth": 0.9353608054176759,
+      "part_auc_vs_truth": 0.9831700294838266,
+      "acc_gap_vs_part": 0.034905891747226914,
+      "auc_gap_vs_part": 0.02791836400564429
+    },
+    "ebm": {
+      "mae_score_vs_part": 0.049442463133677644,
+      "rmse_score_vs_part": 0.11904396215013797,
+      "agreement_with_part": 0.9511040058662311,
+      "acc_vs_truth": 0.9179875458196084,
+      "auc_vs_truth": 0.974969641998448,
+      "part_acc_vs_truth": 0.9353608054176759,
+      "part_auc_vs_truth": 0.9831700294838266,
+      "acc_gap_vs_part": 0.01737325959806746,
+      "auc_gap_vs_part": 0.008200387485378546
+    },
+    "gbdt": {
+      "mae_score_vs_part": 0.03416257004282424,
+      "rmse_score_vs_part": 0.08536528864236372,
+      "agreement_with_part": 0.9676036066090888,
+      "acc_vs_truth": 0.9271593122702826,
+      "auc_vs_truth": 0.9793157687377958,
+      "part_acc_vs_truth": 0.9353608054176759,
+      "part_auc_vs_truth": 0.9831700294838266,
+      "acc_gap_vs_part": 0.008201493147393268,
+      "auc_gap_vs_part": 0.003854260746030791
+    }
+  },
+  "val": {
+    "ridge": {
+      "mae_score_vs_part": 0.07670743107589093,
+      "rmse_score_vs_part": 0.16634034235943734,
+      "agreement_with_part": 0.9311983404425321,
+      "acc_vs_truth": 0.8997267983295244,
+      "auc_vs_truth": 0.9545700025321343,
+      "part_acc_vs_truth": 0.9340618711212683,
+      "part_auc_vs_truth": 0.9825399126177212,
+      "acc_gap_vs_part": 0.03433507279174386,
+      "auc_gap_vs_part": 0.027969910085586913
+    },
+    "ebm": {
+      "mae_score_vs_part": 0.04983996202589201,
+      "rmse_score_vs_part": 0.11950940227590374,
+      "agreement_with_part": 0.9507591830252681,
+      "acc_vs_truth": 0.9175357755230162,
+      "auc_vs_truth": 0.9745297396680455,
+      "part_acc_vs_truth": 0.9340618711212683,
+      "part_auc_vs_truth": 0.9825399126177212,
+      "acc_gap_vs_part": 0.016526095598252022,
+      "auc_gap_vs_part": 0.008010172949675765
+    },
+    "gbdt": {
+      "mae_score_vs_part": 0.035213697942018965,
+      "rmse_score_vs_part": 0.08765717978729663,
+      "agreement_with_part": 0.9667765924977482,
+      "acc_vs_truth": 0.9260147047511285,
+      "auc_vs_truth": 0.978699566987227,
+      "part_acc_vs_truth": 0.9340618711212683,
+      "part_auc_vs_truth": 0.9825399126177212,
+      "acc_gap_vs_part": 0.008047166370139802,
+      "auc_gap_vs_part": 0.0038403456304941797
+    }
+  },
+  "test": {
+    "ridge": {
+      "mae_score_vs_part": 0.07617700691889986,
+      "rmse_score_vs_part": 0.16580894187998163,
+      "agreement_with_part": 0.9321508221555004,
+      "acc_vs_truth": 0.900905695311127,
+      "auc_vs_truth": 0.9551760912632993,
+      "part_acc_vs_truth": 0.9353339983514811,
+      "part_auc_vs_truth": 0.9830638432406879,
+      "acc_gap_vs_part": 0.03442830304035416,
+      "auc_gap_vs_part": 0.027887751977388575
+    },
+    "ebm": {
+      "mae_score_vs_part": 0.04961479288099505,
+      "rmse_score_vs_part": 0.11968102970204655,
+      "agreement_with_part": 0.9511162156341971,
+      "acc_vs_truth": 0.9181384112336912,
+      "auc_vs_truth": 0.9751113587775342,
+      "part_acc_vs_truth": 0.9353339983514811,
+      "part_auc_vs_truth": 0.9830638432406879,
+      "acc_gap_vs_part": 0.0171955871177899,
+      "auc_gap_vs_part": 0.007952484463153664
+    },
+    "gbdt": {
+      "mae_score_vs_part": 0.035138424247670566,
+      "rmse_score_vs_part": 0.08800579202731751,
+      "agreement_with_part": 0.966569224181248,
+      "acc_vs_truth": 0.9271310077500192,
+      "auc_vs_truth": 0.9793312773460852,
+      "part_acc_vs_truth": 0.9353339983514811,
+      "part_auc_vs_truth": 0.9830638432406879,
+      "acc_gap_vs_part": 0.008202990601461901,
+      "auc_gap_vs_part": 0.0037325658946026907
+    }
+  }
+}
