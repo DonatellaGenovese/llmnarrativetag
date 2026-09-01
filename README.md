@@ -142,26 +142,18 @@ Every number above regenerates from a command in this repository. Not tracked he
 
 ## Citation
 
-**Particle Transformer**, the tagger being explained, and **JetClass**, the dataset it is pretrained on:
+H. Qu, C. Li and S. Qian, *Particle Transformer for Jet Tagging*, ICML 2022, PMLR **162** (2022) 18281. [arXiv:2202.03772](https://arxiv.org/abs/2202.03772)
 
-> H. Qu, C. Li and S. Qian, *Particle Transformer for Jet Tagging*, ICML 2022, PMLR **162** (2022) 18281. [arXiv:2202.03772](https://arxiv.org/abs/2202.03772)
->
-> H. Qu, C. Li and S. Qian, *JetClass: A Large-Scale Dataset for Deep Learning in Jet Physics*, Zenodo (2022). [doi:10.5281/zenodo.6601445](https://doi.org/10.5281/zenodo.6601445)
+H. Qu, C. Li and S. Qian, *JetClass: A Large-Scale Dataset for Deep Learning in Jet Physics*, Zenodo (2022). [doi:10.5281/zenodo.6601445](https://doi.org/10.5281/zenodo.6601445)
 
-**TopLandscape**, the dataset the teacher is fine-tuned and explained on, and the benchmark it was assembled for:
+G. Kasieczka, T. Plehn, J. Thompson and M. Russell, *Top Quark Tagging Reference Dataset*, Zenodo (2019). [doi:10.5281/zenodo.2603256](https://doi.org/10.5281/zenodo.2603256)
 
-> G. Kasieczka, T. Plehn, J. Thompson and M. Russell, *Top Quark Tagging Reference Dataset*, Zenodo (2019). [doi:10.5281/zenodo.2603256](https://doi.org/10.5281/zenodo.2603256)
->
-> G. Kasieczka, T. Plehn, A. Butter et al., *The Machine Learning Landscape of Top Taggers*, SciPost Phys. **7** (2019) 014. [arXiv:1902.09914](https://arxiv.org/abs/1902.09914)
+G. Kasieczka, T. Plehn, A. Butter et al., *The Machine Learning Landscape of Top Taggers*, SciPost Phys. **7** (2019) 014. [arXiv:1902.09914](https://arxiv.org/abs/1902.09914)
 
-**Explainable Boosting Machines**, the surrogate, through the InterpretML implementation:
+Y. Lou, R. Caruana and J. Gehrke, *Intelligible Models for Classification and Regression*, KDD 2012, 150. [doi:10.1145/2339530.2339556](https://doi.org/10.1145/2339530.2339556)
 
-> Y. Lou, R. Caruana and J. Gehrke, *Intelligible Models for Classification and Regression*, KDD 2012, 150. [doi:10.1145/2339530.2339556](https://doi.org/10.1145/2339530.2339556)
->
-> H. Nori, S. Jenkins, P. Koch and R. Caruana, *InterpretML: A Unified Framework for Machine Learning Interpretability*, (2019). [arXiv:1909.09223](https://arxiv.org/abs/1909.09223)
+H. Nori, S. Jenkins, P. Koch and R. Caruana, *InterpretML: A Unified Framework for Machine Learning Interpretability*, (2019). [arXiv:1909.09223](https://arxiv.org/abs/1909.09223)
 
-**FastJet** and **fjcontrib**, used to compute the observables, and **weaver**, the training framework ParT is built on:
+M. Cacciari, G. P. Salam and G. Soyez, *FastJet User Manual*, Eur. Phys. J. C **72** (2012) 1896. [arXiv:1111.6097](https://arxiv.org/abs/1111.6097)
 
-> M. Cacciari, G. P. Salam and G. Soyez, *FastJet User Manual*, Eur. Phys. J. C **72** (2012) 1896. [arXiv:1111.6097](https://arxiv.org/abs/1111.6097)
->
-> [fastjet-contrib](https://fastjet.hepforge.org/contrib/) and [hqucms/weaver-core](https://github.com/hqucms/weaver-core)
+[fastjet-contrib](https://fastjet.hepforge.org/contrib/) and [hqucms/weaver-core](https://github.com/hqucms/weaver-core)
