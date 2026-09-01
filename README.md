@@ -20,7 +20,7 @@ Four LLMs are benchmarked as narrators (Gemini 3.5 Flash, Gemini 3.5 Flash-Lite,
 
 ## Getting Started
 
-Two environments, because the teacher and the rest have incompatible dependency stacks. Everything is run from the repository root.
+Two environments, because the teacher and the rest have incompatible dependency stacks. Everything is run from the repository root. The datasets, the checkpoints, the teacher logits, the feature tables and the narrative runs are not tracked here: they are large, and reproducible from the steps below.
 
 ```bash
 # Observables, surrogate, narrative, evaluation
@@ -134,11 +134,23 @@ python -m evaluation.agreement                 # human and judge agreement, --la
 | DeepSeek v4 Flash | 0.93 | 0.96 | 0.99 | 0.87 | 0.80 | 0.64 |
 | GPT-OSS 120B | 0.97 | 0.13 | 0.37 | 0.24 | 0.90 | 0.10 |
 
-All four report artifact numbers accurately, yet delivery ranges from 0.96 to 0.10: faithfulness alone is a misleading criterion, and the models fail in different ways.
+**Judge scores by generator**, mean ± SD on a 0 to 3 scale. `N` is the number of narratives that passed verification and were therefore judged, so the columns are conditional on delivery and are not comparable across models.
 
-The judge is an aggregate baseline, not a substitute for reading a narrative. It reproduces the annotators' positive or negative verdict on 95% of judgments, but its quadratic-weighted kappa against them is 0.25 where the two annotators score 0.86 against each other, and of the six human ratings at or below 1 it caught none.
+| model | N | Ling. Realization | Int. Consistency | Overall Sat. |
+|---|---|---|---|---|
+| Gemini 3.5 Flash-Lite | 51 | 2.43 ± 0.50 | 2.94 ± 0.31 | 2.59 ± 0.50 |
+| Gemini 3.5 Flash | 86 | 2.98 ± 0.15 | 2.99 ± 0.11 | 2.88 ± 0.32 |
+| DeepSeek v4 Flash | 58 | 2.78 ± 0.46 | 2.97 ± 0.18 | 2.72 ± 0.45 |
+| GPT-OSS 120B | 9 | 3.00 ± 0.00 | 3.00 ± 0.00 | 2.56 ± 0.53 |
 
-Every number above regenerates from a command in this repository. Not tracked here: the datasets, the checkpoints, the teacher logits, the feature tables and the narrative runs, all large and all reproducible from the steps above.
+**Judge against humans** on the same twenty narratives, five per generator. The judge agrees with the annotators on 95% of the positive/negative collapse but scores kappa_w 0.25 against them, where the two annotators score 0.86 against each other.
+
+| rater | N | Ling. Realization | Int. Consistency | Overall Sat. |
+|---|---|---|---|---|
+| Annotator A | 20 | 2.25 ± 0.64 | 3.00 ± 0.00 | 2.30 ± 0.47 |
+| Annotator B | 20 | 2.20 ± 0.77 | 3.00 ± 0.00 | 2.45 ± 0.51 |
+| Human mean | 20 | 2.23 ± 0.68 | 3.00 ± 0.00 | 2.38 ± 0.46 |
+| LLM judge | 20 | 2.80 ± 0.41 | 3.00 ± 0.00 | 2.75 ± 0.44 |
 
 ## Citation
 
