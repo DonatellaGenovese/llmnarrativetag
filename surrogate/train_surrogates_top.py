@@ -305,10 +305,6 @@ def train_all(
 
 def main():
     repo = Path(__file__).resolve().parents[1]
-    pred_dir = (
-        repo
-        / "training/TopLandscape/ParT-FineTune/20260725-162630_example_ParticleTransformer_finetune_ranger_lr0.0001_batch512/predict_output"
-    )
     feat_dir = repo / "surrogate/outputs/top/features"
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--train", type=Path, default=feat_dir / "features_train.parquet")

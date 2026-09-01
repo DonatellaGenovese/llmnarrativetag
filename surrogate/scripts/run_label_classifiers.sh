@@ -12,7 +12,15 @@ cd "$REPO"
 MAX_JETS="${1:-}"
 
 set +u
-source /opt/miniforge3/etc/profile.d/conda.sh
+# Resolve conda without assuming an install prefix. `conda info --base` alone
+# is not enough: these scripts are meant to be run detached, where conda is not
+# on PATH, which is exactly when a hardcoded prefix used to be needed.
+_base="${CONDA_EXE:+$(dirname "$(dirname "$CONDA_EXE")")}"
+if [ -z "$_base" ] && command -v conda >/dev/null 2>&1; then _base="$(conda info --base)"; fi
+for _c in "$_base" /opt/miniforge3 "$HOME/miniforge3" "$HOME/miniconda3" "$HOME/anaconda3"; do
+  if [ -n "$_c" ] && [ -f "$_c/etc/profile.d/conda.sh" ]; then . "$_c/etc/profile.d/conda.sh"; break; fi
+done
+command -v conda >/dev/null 2>&1 || { echo "conda not found: set CONDA_EXE"; exit 1; }
 conda activate part-surrogate
 set -u
 export PYTHONPATH="$REPO${PYTHONPATH:+:$PYTHONPATH}"

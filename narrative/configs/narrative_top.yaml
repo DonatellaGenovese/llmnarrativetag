@@ -52,9 +52,10 @@ llm:
   # (--backend, --model), which is how a sweep runs several providers against
   # one config without editing it in between.
   backend: vertex
-  # Environment wins over both, so a different project needs no edit here:
-  #   GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION
-  project: llm-narrative-jettag
+  # Left empty on purpose: a Vertex project is specific to whoever is running
+  # this, and the client reads GOOGLE_CLOUD_PROJECT (and GOOGLE_CLOUD_LOCATION)
+  # from the environment, raising a message that says so if neither is set.
+  project: null
   # "global", not a region: the Gemini 3.x models are served only from the
   # global endpoint and return 404 from every regional one (tested us-central1,
   # us-east5, europe-west4). The 2.5 family works from both, so global is the

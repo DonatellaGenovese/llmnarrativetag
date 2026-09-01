@@ -110,13 +110,16 @@ def main():
     p.add_argument(
         "--data-parquet",
         type=Path,
-        default=repo / "datasets/TopLandscape/test_file.parquet",
+        required=True,
+        help="TopLandscape split, e.g. particle_transformer/datasets/TopLandscape/test_file.parquet",
     )
+    # No default: weaver names each training run after its start time, so the
+    # path differs on every machine. run_official_top.sh discovers it.
     p.add_argument(
         "--pred-parquet",
         type=Path,
-        default=repo
-        / "training/TopLandscape/ParT-FineTune/20260725-162630_example_ParticleTransformer_finetune_ranger_lr0.0001_batch512/predict_output/TopLandscape_ParT-FineTune_logits.parquet",
+        required=True,
+        help="ParT logits for the same split, from that run's predict_output/",
     )
     p.add_argument(
         "--out",

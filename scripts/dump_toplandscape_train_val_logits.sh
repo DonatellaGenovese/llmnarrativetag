@@ -14,7 +14,19 @@ cd "$HERE/../particle_transformer"
 source env.sh
 source .venv/bin/activate
 
-CKPT="${1:-training/TopLandscape/ParT-FineTune/20260725-162630_example_ParticleTransformer_finetune_ranger_lr0.0001_batch512/net_best_epoch_state.pt}"
+# Weaver names each training run after its start time, so pass the checkpoint
+# explicitly or let this pick the only one there is.
+CKPT="${1:-}"
+if [[ -z "$CKPT" ]]; then
+  mapfile -t _ckpts < <(ls -d training/TopLandscape/ParT-FineTune/*/net_best_epoch_state.pt 2>/dev/null)
+  if [[ ${#_ckpts[@]} -ne 1 ]]; then
+    echo "Found ${#_ckpts[@]} fine-tune checkpoints; pass the one you want as \$1:"
+    printf '  %s\n' "${_ckpts[@]}"
+    exit 1
+  fi
+  CKPT="${_ckpts[0]}"
+fi
+echo "checkpoint: $CKPT"
 DATADIR="${DATADIR_TopLandscape:-./datasets/TopLandscape}"
 OUTDIR="$(dirname "$CKPT")/predict_output"
 mkdir -p "$OUTDIR" logs
