@@ -50,3 +50,6 @@ evaluation/.judges.lock
 
 # OS
 .DS_Store
+
+# Anomaly head: cached tokens, decoder checkpoints and per-jet scores.
+anomaly/outputs/
