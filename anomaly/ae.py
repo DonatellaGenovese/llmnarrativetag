@@ -123,15 +123,24 @@ def masked_mse(pred: torch.Tensor, target: torch.Tensor,
     return se.sum(dim=(1, 2)) / (n_real * n_chan)
 
 
-def unpack_batch(X: Dict[str, torch.Tensor], input_names, chan_idx,
-                 device) -> Tuple[torch.Tensor, ...]:
+def unpack_batch(X: Dict[str, torch.Tensor], input_names, chan_idx, device,
+                 top_k: int | None = None) -> Tuple[torch.Tensor, ...]:
     """The tensors the model needs, plus the reconstruction target and mask.
 
     `pf_mask` comes shaped (B, 1, S); the channel axis is dropped here so the
     mask can broadcast over the decoder's (B, S, C).
+
+    `top_k` truncates what is *reconstructed*, never what is encoded. The
+    encoder still sees the whole jet; the decoder is asked only for the k
+    hardest constituents, which the file already sorts first. That makes the
+    number of compared slots the same for almost every jet, and takes the jet's
+    multiplicity out of a score that should be measuring its substructure.
     """
     feats = X[input_names[1]].to(device, non_blocking=True)     # (B, C_all, S)
     vecs = X[input_names[2]].to(device, non_blocking=True)
     mask = X[input_names[3]].to(device, non_blocking=True)      # (B, 1, S)
     target = feats[:, chan_idx, :].transpose(1, 2).contiguous()  # (B, S, C)
-    return feats, vecs, mask, target, mask.squeeze(1).float()
+    mask2d = mask.squeeze(1).float()
+    if top_k:
+        target, mask2d = target[:, :top_k, :].contiguous(), mask2d[:, :top_k].contiguous()
+    return feats, vecs, mask, target, mask2d

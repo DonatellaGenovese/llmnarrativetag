@@ -87,7 +87,8 @@ def make_loader(files, data_config, batch_size, workers, name):
 
 @torch.no_grad()
 def cache_split(backbone, loader, input_names, label_name, chan_idx, device,
-                keep_half: str | None, max_jets: int | None, desc: str):
+                keep_half: str | None, max_jets: int | None, desc: str,
+                top_k: int | None = None):
     """Stream once, keep the background jets of the requested half.
 
     `keep_half` splits the background deterministically on row parity, which is
@@ -96,7 +97,7 @@ def cache_split(backbone, loader, input_names, label_name, chan_idx, device,
     xs, ts, ms = [], [], []
     row, kept = 0, 0
     for X, y, _Z in tqdm(loader, desc=desc):
-        feats, vecs, mask, target, mask2d = unpack_batch(X, input_names, chan_idx, device)
+        feats, vecs, mask, target, mask2d = unpack_batch(X, input_names, chan_idx, device, top_k)
         lab = y[label_name].numpy().reshape(-1)
         idx = np.arange(row, row + len(lab))
         row += len(lab)
@@ -157,6 +158,8 @@ def main() -> None:
     p.add_argument("--checkpoint", default="models/ParT_kin.pt",
                    help="JetClass pretraining; never the TopLandscape fine-tune")
     p.add_argument("--channels", nargs="+", default=DEFAULT_CHANNELS)
+    p.add_argument("--top-k", type=int, default=None,
+                   help="Reconstruct only the k hardest constituents (they are pT-sorted)")
     p.add_argument("--hidden", type=int, default=512)
     p.add_argument("--epochs", type=int, default=30)
     p.add_argument("--batch-size", type=int, default=512)
@@ -174,7 +177,9 @@ def main() -> None:
     device = torch.device(f"cuda:{args.gpus.split(',')[0]}"
                           if args.gpus and torch.cuda.is_available() else "cpu")
     chan_idx = channel_index(args.channels)
-    print(f"reconstructing {len(args.channels)} channels: {', '.join(args.channels)}")
+    n_slots = args.top_k or 128
+    print(f"reconstructing {len(args.channels)} channels over {n_slots} slots: "
+          f"{', '.join(args.channels)}")
 
     ds_tr, dl_tr = make_loader("datasets/TopLandscape/train_file.parquet",
                                args.data_config, args.batch_size, args.num_workers, "train")
@@ -183,13 +188,13 @@ def main() -> None:
     backbone = build_backbone(ds_tr.config, args.network_config, args.checkpoint).to(device).eval()
 
     x_tr, t_tr, m_tr = cache_split(backbone, dl_tr, input_names, label_name, chan_idx,
-                                   device, "ae", args.max_jets, "cache train (QCD, AE half)")
+                                   device, "ae", args.max_jets, "cache train (QCD, AE half)", args.top_k)
     ds_va, dl_va = make_loader("datasets/TopLandscape/val_file.parquet",
                                args.data_config, args.batch_size, args.num_workers, "val")
     x_va, t_va, m_va = cache_split(backbone, dl_va, input_names, label_name, chan_idx,
-                                   device, None, args.max_jets, "cache val (QCD)")
+                                   device, None, args.max_jets, "cache val (QCD)", args.top_k)
 
-    model = JetAutoencoder(backbone, n_channels=len(args.channels),
+    model = JetAutoencoder(backbone, n_channels=len(args.channels), n_slots=n_slots,
                            hidden=args.hidden, freeze_encoder=True).to(device)
     n_par = sum(p.numel() for p in model.decoder.parameters())
     print(f"decoder: {n_par:,} parameters\n")
@@ -205,7 +210,8 @@ def main() -> None:
         if va < best - 1e-6:
             best, best_epoch, bad = va, epoch, 0
             torch.save({"decoder": model.decoder.state_dict(),
-                        "channels": args.channels, "hidden": args.hidden},
+                        "channels": args.channels, "hidden": args.hidden,
+                        "top_k": args.top_k, "n_slots": n_slots},
                        args.out_dir / "decoder.pt")
             flag = "  <- best"
         else:

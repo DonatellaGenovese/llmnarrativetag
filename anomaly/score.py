@@ -41,11 +41,11 @@ from .train import QCD_LABEL, build_backbone, make_loader
 
 @torch.no_grad()
 def score_split(backbone, decoder, loader, input_names, label_name, chan_idx,
-                device, desc: str, max_jets: int | None):
+                device, desc: str, max_jets: int | None, top_k: int | None = None):
     """Per-jet reconstruction error, in file order, for every jet of a split."""
     errs, labs = [], []
     for X, y, _Z in tqdm(loader, desc=desc):
-        feats, vecs, mask, target, mask2d = unpack_batch(X, input_names, chan_idx, device)
+        feats, vecs, mask, target, mask2d = unpack_batch(X, input_names, chan_idx, device, top_k)
         x_cls = backbone(feats, v=vecs, mask=mask).float()
         err = masked_mse(decoder(x_cls), target, mask2d)
         errs.append(err.cpu().numpy())
@@ -81,10 +81,13 @@ def main() -> None:
     blob = torch.load(args.decoder, map_location="cpu")
     channels = blob["channels"]
     chan_idx = channel_index(channels)
-    decoder = ConstituentDecoder(n_channels=len(channels), hidden=blob["hidden"])
+    top_k = blob.get("top_k")
+    decoder = ConstituentDecoder(n_slots=blob.get("n_slots", 128),
+                                 n_channels=len(channels), hidden=blob["hidden"])
     decoder.load_state_dict(blob["decoder"])
     decoder.to(device).eval()
-    print(f"decoder <- {args.decoder}  ({len(channels)} channels: {', '.join(channels)})")
+    print(f"decoder <- {args.decoder}  ({len(channels)} channels over "
+      f"{blob.get('n_slots', 128)} slots: {', '.join(channels)})")
 
     backbone = None
     raw = {}
@@ -97,7 +100,7 @@ def main() -> None:
             backbone = build_backbone(ds.config, args.network_config,
                                       args.checkpoint).to(device).eval()
         raw[split] = score_split(backbone, decoder, dl, input_names, label_name,
-                                 chan_idx, device, f"score {split}", args.max_jets)
+                                 chan_idx, device, f"score {split}", args.max_jets, top_k)
 
     # The normalisation lives on background jets the decoder never saw: the odd
     # rows of the train split, which anomaly.train left to the surrogate.
