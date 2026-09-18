@@ -79,7 +79,8 @@ def main() -> None:
     assert (f_tr.label.to_numpy() == tr["label"]).all() and (f_te.label.to_numpy() == te["label"]).all()
     lab_tr, lab_te = tr["label"], te["label"]
     m_tr, m_te = f_tr.m_SD.to_numpy(), f_te.m_SD.to_numpy()
-    head = pd.read_parquet(args.out_dir / "density_models_test.parquet")["d_head_not_qcd"].to_numpy()
+    head_path = args.out_dir / "density_models_test.parquet"
+    head = (pd.read_parquet(head_path)["d_head_not_qcd"].to_numpy() if head_path.exists() else None)
 
     out = {}
     hdr = f"{'':<34}{'AUC':>7}{'TPR@10%':>16}{'TPR@1%':>16}{'TPR@0.1%':>16}"
@@ -89,7 +90,14 @@ def main() -> None:
     is_bkg = lab_te == QCD_LABEL
     eu, n_fit = euclid_fit_on(tr["x"], lab_tr, QCD_LABEL, te["x"])
     md = mass_distance(m_tr, lab_tr, QCD_LABEL, m_te)
-    scores = {"euclid (x_cls)": eu, "mass distance only": md, "head_not_qcd": head}
+    cos_c = tr["x"][(lab_tr == QCD_LABEL) & (np.arange(len(lab_tr)) % 2 == 0)].astype(np.float64)
+    mu_c, sd_c = cos_c.mean(0), cos_c.std(0) + 1e-6
+    zc = (te["x"].astype(np.float64) - mu_c) / sd_c
+    cen = ((cos_c - mu_c) / sd_c).mean(0)
+    cosine = 1 - (zc @ cen) / (np.linalg.norm(zc, axis=1) * np.linalg.norm(cen) + 1e-12)
+    scores = {"euclid (x_cls)": eu, "cosine (x_cls)": cosine, "mass distance only": md}
+    if head is not None:
+        scores["head_not_qcd"] = head
 
     print(f"1) MASS   fit on {n_fit:,} QCD, anomaly = top\n{hdr}")
     out["standard"] = {}
@@ -105,7 +113,7 @@ def main() -> None:
         print(f"  {name:<32}{fmt(r)}")
 
     print("\n  inside m_SD windows (AUC | TPR at 1% of the window's own QCD):")
-    print(f"  {'window [GeV]':<16}{'n top':>8}{'n QCD':>8}{'euclid':>18}{'mass dist':>18}{'head_not_qcd':>18}")
+    print(f"  {'window [GeV]':<16}{'n top':>8}{'n QCD':>8}" + "".join(f"{n[:16]:>18}" for n in scores))
     out["windows"] = []
     for lo, hi in ((0, 60), (60, 120), (120, 150), (150, 170), (170, 190), (190, 250)):
         sel = (m_te >= lo) & (m_te < hi)
