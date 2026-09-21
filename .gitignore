@@ -51,11 +51,5 @@ evaluation/.judges.lock
 # OS
 .DS_Store
 
-# Anomaly head: cached tokens, decoder checkpoints and per-jet scores.
+# Anomaly: cached class tokens, trained classifiers and per-jet scores.
 anomaly/outputs/
-
-# Sophon: downloaded weights and the embeddings/scores they produce.
-anomaly/sophon/*.pt
-anomaly/sophon/*.npz
-anomaly/sophon/*.parquet
-anomaly/sophon/embeddings/
