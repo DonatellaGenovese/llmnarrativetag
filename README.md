@@ -24,7 +24,7 @@ Two environments, because the teacher and the rest have incompatible dependency 
 
 ```bash
 # Observables, surrogate, narrative, evaluation
-conda env create -f environment.yml
+conda env create -f environment.yaml
 conda activate part-surrogate
 export PYTHONPATH="$PWD"
 

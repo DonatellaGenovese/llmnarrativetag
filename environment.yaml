@@ -8,7 +8,7 @@
 # ParT inference is NOT here. Torch and weaver conflict with this stack and run
 # in their own venv; see the README.
 #
-#   conda env create -f environment.yml
+#   conda env create -f environment.yaml
 #   conda activate part-surrogate
 name: part-surrogate
 channels:
