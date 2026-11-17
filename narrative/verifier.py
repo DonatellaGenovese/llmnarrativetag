@@ -51,6 +51,9 @@ SCALAR_TAGS = {
     "B": "intercept",
     "N": "n_other",
     "O": "phi_other",
+    # Anomaly detection (narrative.artefact_anomaly): the detector rarity, the
+    # % of background reference jets scoring higher than this one.
+    "AR": "detector_rarity",
 }
 # `pct` is deliberately absent: it reaches the narrator as context for [S<i>]
 # but is not itself tagged.
@@ -88,7 +91,9 @@ RARITY_BANDS = ((2.0, "extreme"), (10.0, "unusual"), (float("inf"), "ordinary"))
 # per-family rates are what carry the signal. Kept as evidence that a targeted
 # fix and a measurable improvement are different claims.
 SIDE_BANDS = ((25.0, "low"), (75.0, "mid"), (float("inf"), "high"))
-WORD_RE = re.compile(r"\[([A-Za-z][A-Za-z0-9_]*)\]\s*([A-Za-z]+)\s*\[/\1\]")
+# Hyphenated words parse as words (then are checked like any other), so that
+# [DEC]background-like[/DEC] is a reading rather than a malformed tag.
+WORD_RE = re.compile(r"\[([A-Za-z][A-Za-z0-9_]*)\]\s*([A-Za-z]+(?:-[A-Za-z]+)*)\s*\[/\1\]")
 
 
 def _band(value: float, bands) -> str:
@@ -115,6 +120,23 @@ def side_band(pct: float) -> str:
 def direction_word(phi: float, decision: str, other_class: str) -> str:
     """The class a contribution pushes towards."""
     return decision if phi >= 0 else other_class
+
+
+def ad_direction_word(phi: float, words: Dict[str, str]) -> str:
+    """Anomaly detection: contributions are not oriented, so the word depends
+    on the sign alone, with the two words the artefact declares."""
+    return words["positive"] if phi >= 0 else words["negative"]
+
+
+def ad_decision_word(decision: str, words: Dict[str, str]) -> str:
+    """The AD decision as [DEC] must carry it: the artefact's own word,
+    `anomalous` or `background-like` (prompt ad-v3: copy `decision`)."""
+    return words["positive"] if decision == "anomalous" else f"{words['negative']}-like"
+
+
+# Tag -> {written form: canonical word}. Up to prompt ad-v2 [DEC] asked for the
+# single word "background"; narratives written under it stay valid.
+WORD_ALIASES: Dict[str, Dict[str, str]] = {"DEC": {"background": "background-like"}}
 
 
 def recon_word(recon_pct: float) -> str:
@@ -174,6 +196,13 @@ def required_reading_tags(artefact: dict, reading_top_k: int = READING_TOP_K) ->
     out: List[str] = []
     if "recon_pct" in artefact:
         out.append("GQ")
+    # Anomaly detection: the decision and the two bands are always required.
+    if "direction_words" in artefact:
+        out.append("DEC")
+    if "detector_band" in artefact:
+        out.append("A")
+    if "surrogate_band" in artefact:
+        out.append("AS")
     for position, f in enumerate(artefact.get("features", []), start=1):
         if position > reading_top_k:
             continue
@@ -198,9 +227,19 @@ def expected_words(artefact: dict, reading_top_k: int = READING_TOP_K) -> Dict[s
     if "recon_pct" in artefact:
         out["GQ"] = recon_word(float(artefact["recon_pct"]))
     decision, other = artefact.get("decision"), artefact.get("other_class")
+    # Anomaly detection: the words travel in the artefact; the bands are words
+    # the artefact already holds, computed by the builder from the rarities.
+    ad_words = artefact.get("direction_words")
+    if ad_words:
+        out["DEC"] = ad_decision_word(decision, ad_words)
+    if "detector_band" in artefact:
+        out["A"] = artefact["detector_band"]
+    if "surrogate_band" in artefact:
+        out["AS"] = artefact["surrogate_band"]
     for position, f in enumerate(artefact.get("features", []), start=1):
         index = f.get("i", position)
-        out[f"D{index}"] = direction_word(float(f["phi"]), decision, other)
+        out[f"D{index}"] = (ad_direction_word(float(f["phi"]), ad_words) if ad_words
+                            else direction_word(float(f["phi"]), decision, other))
         if "rarity" in f:
             out[f"Q{index}"] = rarity_band(float(f["rarity"]))
         if "pct" in f:
@@ -279,6 +318,7 @@ def verify(
     glossary: Optional[dict] = None,
     require_complete: bool = True,
     extra_literals: Sequence[str] = (),
+    banned_terms: Sequence[str] = (),
 ) -> VerificationReport:
     expected = expected_values(artefact)
     words = expected_words(artefact)
@@ -310,6 +350,7 @@ def verify(
     # number says — the failure the numeric checks cannot see.
     for match in WORD_RE.finditer(narrative):
         tag, word = match.group(1), match.group(2).lower()
+        word = WORD_ALIASES.get(tag, {}).get(word, word)
         if tag not in words:
             if tag not in expected:
                 violations.append(
@@ -372,6 +413,18 @@ def verify(
             if len(snippet) > 120:
                 snippet = snippet[:117] + "..."
             violations.append(Violation("untagged_number", f"bare digits in: {snippet!r}"))
+
+    # 5. Identity claims (anomaly detection). The detector never learns what the
+    # signal is, so the narrative may say how the jet differs from the
+    # background but not what produced it. Each term is a whole-word,
+    # case-insensitive regular expression; empty for top tagging.
+    for term in banned_terms:
+        for m in re.finditer(rf"(?<![A-Za-z0-9_])(?:{term})(?![A-Za-z0-9_])", narrative, re.I):
+            violations.append(Violation(
+                "identity_claim",
+                f"names {m.group(0)!r}: the detector does not know what produced the jet",
+            ))
+            break
 
     return VerificationReport(
         ok=not violations,

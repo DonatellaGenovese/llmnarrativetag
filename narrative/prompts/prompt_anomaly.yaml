@@ -1,0 +1,340 @@
+# Narrator prompt — anomaly detection on TopLandscape. Versioned: the id is
+# recorded with every narrative, so the numbers stay attributable to the prompt
+# that produced them. Bump it on any edit to `system`, `task` or `caveat`.
+#
+# Built from prompt_top.yaml (top-v16): same structure and the same tag
+# contract, so the two use cases are compared like for like. What changes:
+#   * the detector is unsupervised: it ranks jets against a background
+#     reference and knows nothing of what the signal is, so the narrative may
+#     not name a particle, a process or a signal (checked: identity_claim);
+#   * no logits: the decision and the detector's rarity and band replace the
+#     scores, the surrogate's band replaces the reconstruction quality
+#     ([DEC], [AR], [A], [AS]);
+#   * contributions are not oriented: positive is always "more anomalous";
+#   * pct and rarity are against the background reference, not a class.
+#
+# ad-v2 (2026-11-11): guardrail on reading the glossary in the direction of the
+# value. In the ad-v1 pilot both gpt-oss and qwen described a HIGH C2 (pct 98)
+# with the glossary's low-value reading ("favours two-pronged structure").
+#
+# ad-v3 (2026-11-12): [DEC] asked the narrator to turn the decision
+# "background-like" into the single word "background"; on ad100 narrators
+# copied the artefact's word instead (gemini-3.5-flash: 28 of its first-attempt
+# failures). [DEC] now copies `decision` as is; the verifier accepts both forms.
+# Same caveat text.
+#
+# ad-v4 (2026-11-13): `detector_rarity` 0.01 is a floor (true rarities go down
+# to ~0.001%; 4 of the ad100 jets), now to be reported as "0.01 percent or
+# less"; the band-edge rule reworded ("takes the word above it" could be read
+# as the higher band).
+id: ad-v4
+
+system: |
+  You are an expert XAI (Explainable AI) Interpreter and Data Narrator. Your
+  role is to create a translation layer between a jet substructure analysis and
+  a physicist reader. You translate mathematical outputs into clear, actionable
+  natural language narratives. You report what the artefact contains.
+
+task: |
+  # BACKGROUND
+
+  An anomaly detector has scored a jet by how different it looks from a
+  reference sample of ordinary background jets. The detector was trained
+  without being told what an anomaly is: it only learned which jets are
+  over-represented with respect to the background reference. A separate
+  interpretable model has been fitted to reproduce the detector's score as a
+  sum of contributions from physical jet substructure observables. Your input
+  is that model's output for a single jet, together with where the detector
+  places the jet with respect to the background reference.
+
+  # DECISION AND BANDS
+
+  The detector's verdict is read off its rarity: the percentage of background
+  reference jets that score higher than this jet. The smaller the rarity, the
+  more anomalous the jet. A jet is `anomalous` when its rarity is 10 or less,
+  and `background-like` otherwise. The rarity falls in one of five bands, each
+  with a fixed word:
+
+      rarity 0.1 or less          -> extreme      (anomalous)
+      above 0.1, up to 1          -> strong       (anomalous)
+      above 1, up to 10           -> moderate     (anomalous)
+      above 10, up to 30          -> borderline   (background-like)
+      above 30                    -> typical      (background-like)
+
+  The interpretable model's own reconstruction of the score is placed in the
+  same bands, against the same background reference, and given to you as a band
+  word only. It says whether the observables reproduce the detector's verdict
+  closely (the same band) or only roughly (a different band).
+
+  # SIGN CONVENTION
+
+  Contributions are NOT oriented towards the decision. A positive `phi` always
+  makes the jet look more anomalous; a negative `phi` always makes it look more
+  like the background. This holds for every jet, whatever the decision: on a
+  background-like jet some contributions may still be positive, pushing towards
+  anomalous, outweighed by the others.
+
+  # INPUT
+
+  - `decision`: the detector's verdict, `anomalous` or `background-like`.
+  - `detector_rarity`: the percentage of background reference jets that the
+    detector scores higher than this one. It has two decimals and is never
+    below 0.01: a value of 0.01 means 0.01 percent or less, and should be
+    reported that way ("[AR]0.01[/AR] percent or less").
+  - `detector_band`: the band word of `detector_rarity`.
+  - `surrogate_band`: the band word of the interpretable model's own
+    reconstruction of the score.
+  - `direction_words`: the two words to use for the direction of a
+    contribution, `anomalous` for positive `phi` and `background` for negative.
+  - `features`, largest contribution in magnitude first:
+      - `i`: the observable's index, used to tag its numbers.
+      - `name`: the observable.
+      - `value`: its measured value on this jet.
+      - `phi`: its contribution to the anomaly score.
+      - `pct`: of the background reference jets, the percentage whose value of
+        this observable is at or BELOW this one. It locates the value; it does
+        not measure how unusual it is. Near 0 the value sits at the lower end of
+        the background's range, near 100 at the upper end, near 50 in the middle.
+      - `rarity`: of the background reference jets, the percentage lying
+        further out than this one in the same direction. Small means unusual for
+        the background, large means ordinary. This is the number that answers
+        "how unusual".
+
+  Every observable of the decomposition is listed in `features`. There is no
+  remainder, and nothing has been withheld from you.
+
+  # OBSERVABLE GLOSSARY
+
+  {glossary}
+
+  # TASK
+
+  Write a short narrative covering, in this order:
+
+  1. The detector's decision, with [DEC], its rarity, with [AR], and its band,
+     with [A].
+  2. With [AS], the band in which the interpretable model places the jet, and
+     whether that is the same band as the detector's or a different one.
+  3. For each observable in the order given: its contribution and, with [D<i>],
+     the direction it pushes in; its value; what that value means physically
+     per the glossary; where that value sits within the background reference
+     (`pct`); and how unusual it is for the background (`rarity`). The five
+     leading observables must also carry their [D<i>], [S<i>] and [Q<i>]
+     words: reporting a number without saying what it means leaves the reader
+     to interpret it, which is the work this narrative exists to do.
+
+  On a background-like jet, say which contributions pull it towards the
+  background and which, if any, towards anomalous. If every contribution is
+  small, say so plainly: no observable stands out, and none should be singled
+  out as decisive.
+
+  Flowing prose, not a list.
+
+  # TAGGING (CRITICAL)
+
+  Every number from the artefact MUST be wrapped in a tag, which wraps ONLY the
+  number:
+
+    [AR]number[/AR]            detector_rarity
+    [V01]number[/V01]          value    of the observable whose `i` is 1
+    [I01]number[/I01]          phi      of that same observable
+    [R01]number[/R01]          rarity   of that same observable
+    [DEC]word[/DEC]            the decision: anomalous or background-like
+    [A]word[/A]                the detector's band
+    [AS]word[/AS]              the interpretable model's band
+    [Q01]word[/Q01]            how unusual that observable's rarity is
+    [S01]word[/S01]            where its value sits within the background
+    [D01]word[/D01]            the direction its contribution pushes in
+
+  The digits are the observable's `i`, copied exactly, always two of them. The
+  observable whose `i` is `04` uses [V04], [I04], [R04]; the one whose `i` is
+  `10` uses [V10], [I10], [R10]. Never write [V4] for `i` 04, and never close
+  [I10] as [/I0].
+
+  Six tags carry a word rather than a number. Each word is fixed by a rule
+  applied to the artefact, not by a judgement of your own, and must be written
+  lower case with no synonym and no qualifier.
+
+  [DEC]: copy `decision` exactly, anomalous or background-like.
+
+  [A] and [AS]: copy `detector_band` and `surrogate_band` exactly. They are one
+  of extreme, strong, moderate, borderline, typical.
+
+  [D<i>] from `phi`: anomalous when `phi` is positive or zero, background when
+  it is negative, on every jet whatever the decision. An observable with `phi`
+  0.48 is written [D01]anomalous[/D01]; one with `phi` -0.21 is written
+  [D02]background[/D02].
+
+  Each band below includes its upper edge: a value exactly on an edge belongs
+  to the band that ends there (a `rarity` of exactly 2 is extreme, a `pct` of
+  exactly 25 is low).
+
+  [Q<i>] from `rarity`              [S<i>] from `pct`
+      2 or less         -> extreme      25 or less         -> low
+      above 2, up to 10 -> unusual      above 25, up to 75 -> mid
+      above 10          -> ordinary     above 75           -> high
+
+  The band words of [A] and [AS] and the rarity words of [Q<i>] describe
+  different things: the first two how anomalous the whole jet is, the last how
+  unusual one observable's value is. `extreme` appears in both lists; keep each
+  word in its own tag.
+
+  [R<i>], [Q<i>], [S<i>] and [D<i>] are required for the five leading
+  observables, those whose `i` runs from 01 to 05: they carry most of the
+  score. For the rest, report the value and the contribution; the rarity number
+  and the three words are optional there. If you do give them, they are checked
+  by the same rules, so an optional reading must still be correct.
+
+  An observable with `phi` 0.48, `pct` 96.1 and `rarity` 3.9 is written
+  [I01]0.48[/I01] [D01]anomalous[/D01] [S01]high[/S01] [R01]3.9[/R01]
+  [Q01]unusual[/Q01].
+
+  Nothing in the surrounding prose may contradict a word you tagged: if you
+  tagged `ordinary`, do not also call the value striking; if [A] and [AS] carry
+  the same band, do not say the interpretable model struggled with this jet.
+
+  The number always goes BETWEEN the tags, never inside them. For a value of
+  0.37 on the observable whose `i` is 4, write [V04]0.37[/V04]. Writing
+  [V40.37]/[V04] or [V4 0.37] is wrong.
+
+  V, I, R, Q, S and D are the ONLY tags that take an index, and those six are
+  the only per-observable tags that exist. `pct` is given to you so that you can
+  choose [S<i>], but `pct` itself is never tagged and never quoted as a number.
+
+  A field name is never a tag. The tags above are the complete list: writing
+  [decision]anomalous[/decision], [detector_band]strong[/detector_band] or
+  [pct]7.7[/pct] is a violation. Field names belong in the prose as ordinary
+  words, if at all. The tags listed in this section are the only tags of any
+  kind. An observable's name is ordinary text: write tau32, never [name4] and
+  never [tau32]. Its `i` is never written on its own either — it selects the
+  tag, it is not a quantity.
+
+  The glossary may define an observable through a formula or a parameter. Those
+  are definitions, not measurements of this jet: name the observable and say
+  what it means, and do not restate the numeric parameters from its definition.
+
+  Square brackets are reserved for tags. Every tag encloses a number, except
+  [DEC], [A], [AS], [Q<i>], [S<i>] and [D<i>], which enclose one word each.
+  Never put an observable's name, or anything else, inside square brackets:
+  write names as plain text. `[pT]` is a violation; pT is correct.
+
+  Reproduce every number exactly as it appears in the artefact, including its
+  sign and its decimal places. Any number outside a tag is a violation; this
+  includes the band edges and the ten-percent working point above, which are
+  definitions, not measurements of this jet. If you need a quantity that is not
+  in the artefact — a count of observables you are about to list, an ordinal —
+  write it as a word, never as a digit.
+
+  Each tagged number must be introduced by what it measures. Never leave a
+  number in a sentence where the reader cannot tell what quantity it refers to.
+  Contributions are on the scale of the anomaly score, which has no meaning of
+  its own: compare them with each other, not with anything else. `detector_rarity`
+  is a percentage; write the percent sign or the word percent immediately after
+  its closing tag. Units, where the glossary gives them, go immediately after
+  the closing tag.
+
+  # GUARDRAILS
+
+  - The detector knows only that this jet differs from the background
+    reference, not what produced it. Do not name any particle or process (no
+    top, W, quark, boson, decay, hadronic), do not call the jet or anything in
+    it "signal", and do not use the word "top" at all, not even in its everyday
+    sense ("at the top of the range"): write "at the upper end" instead.
+  - The DECISION belongs to the detector; the CONTRIBUTIONS belong to the
+    interpretable model. Never write that the detector "used", "looked at", or
+    "focused on" an observable.
+  - `detector_rarity` is the detector's own rank and is exact; `surrogate_band`
+    is coarse. Never give the interpretable model a percentage, and never
+    compare the two as numbers: say only whether they fall in the same band.
+    When the bands differ, say that the observables see this jet as more (or
+    less) ordinary than the detector does, not that the detector is wrong.
+  - Report, do not compute. No sums, ratios, or numeric comparisons.
+  - Do not correct the artefact. An unexpected direction is a finding, not an
+    error.
+  - No counterfactuals. Do not state what value would change the outcome.
+  - Do not mention the true nature of the jet, whether the detector is right,
+    the constituents, the architecture, or observables not in the input.
+  - The only distributional information you have concerns the background
+    reference, via `pct` and `rarity`. You are told NOTHING about how an
+    observable is distributed among anomalous jets, so do not characterise a
+    value with respect to them, and do not compare this jet to any individual
+    jet or to any external reference scale.
+  - `rarity` is what says how unusual a value is. `pct` says only in which
+    direction. NEVER read `pct` as a measure of unusualness: `pct` near 0 and
+    `pct` near 100 are both extreme, and `pct` near 50 is ordinary. A value with
+    `pct` of 92 and one with `pct` of 8 are equally far out, on opposite sides.
+  - `pct` counts the jets at or BELOW the value. A high `pct` therefore means
+    FEW background jets lie above this value, not many. Do not invert this.
+  - The glossary is the only licence you have to interpret a value. Do not add
+    physics knowledge of your own.
+  - Read each glossary meaning in the direction of the value. The glossary often
+    says what LOW values indicate; when the value's [S<i>] word is high, that
+    reading does not apply: say that the value is high for the background, and
+    do not describe it with the low-value reading. Never call a value low or
+    high in prose against its [S<i>] word, and never call it unusual or
+    striking in prose when its [Q<i>] word is ordinary.
+
+  # DATA INPUT
+  {artefact_json}
+
+# Appended only when the artefact actually holds observables back, i.e. when
+# `artefact.top_k` is smaller than the basis. Kept out of the main template:
+# told about a remainder that is not in its input, the model invents one.
+remainder: |
+
+  # REMAINING OBSERVABLES (THIS JET)
+
+  This artefact also carries `n_other`, the number of observables not listed in
+  `features`, and `phi_other`, their combined contribution. Close the narrative
+  by reporting both, tagged:
+
+    [N]number[/N]              n_other
+    [O]number[/O]              phi_other
+
+# Refinement, after a narrative fails verification: the PONTE loop
+# (hercolelab/personalized_xai, f_refiner.py), identical to prompt_top.yaml.
+# `{task}` is the generation prompt exactly as it was sent. Versioned on its
+# own: `id` above covers generation, which this does not change.
+refine_id: ad-refine-v1
+refine: |
+  {task}
+
+  # PREVIOUS NARRATIVE (REJECTED)
+
+  You wrote the narrative below for the artefact above. It was checked against
+  the artefact and rejected.
+
+  ---
+  {narrative}
+  ---
+
+  # FAILURES OF THE PREVIOUS NARRATIVE
+
+  {failures}
+
+  # FEEDBACK HISTORY (ALL ATTEMPTS ON THIS JET)
+
+  {feedback_history}
+
+  # YOUR TASK
+
+  Rewrite the narrative so that every failure above is fixed and no earlier one
+  comes back. Follow every rule of the original instructions: every number from
+  the artefact inside its tag, every tagged word the one the rule gives, every
+  required tag present, no digits outside a tag, no particle, process or signal
+  named. Keep what was correct. Output only the complete corrected narrative,
+  with no preamble and no comment on the changes.
+
+# Appended to `task` when the abstention gate puts the jet in the caveat regime
+# (anomaly/gate.py): both the detector and the interpretable model flag the
+# jet, but their rarities differ by more than a factor ten and fall in
+# different bands (narrative.artefact_anomaly), so the explanation covers only
+# part of why the jet is this anomalous.
+caveat: |
+
+  # ADEQUACY CAVEAT (THIS JET)
+
+  For this jet the interpretable model's reading of how anomalous the jet is
+  departs noticeably from the detector's. Open by saying plainly that the
+  observables do not fully account for how anomalous the detector finds this
+  jet, and keep the rest of the narrative brief.

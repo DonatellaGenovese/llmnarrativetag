@@ -1,0 +1,866 @@
+{
+ "top-gemini-262721-original": {
+  "use_case": "top",
+  "base": "top-gemini-262721",
+  "perturbation": "original",
+  "target": null,
+  "model": "gemini-3.5-flash",
+  "jet_id": 262721,
+  "observable": null
+ },
+ "top-gemini-262721-ling_garble": {
+  "use_case": "top",
+  "base": "top-gemini-262721",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "gemini-3.5-flash",
+  "jet_id": 262721,
+  "observable": null
+ },
+ "top-gemini-262721-phys_direction": {
+  "use_case": "top",
+  "base": "top-gemini-262721",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 262721,
+  "observable": "C2_double_b1"
+ },
+ "top-gemini-262721-phys_wrong": {
+  "use_case": "top",
+  "base": "top-gemini-262721",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 262721,
+  "observable": null
+ },
+ "top-gemini-262721-phys_overreach": {
+  "use_case": "top",
+  "base": "top-gemini-262721",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 262721,
+  "observable": null
+ },
+ "top-gemini-262721-over_nodecision": {
+  "use_case": "top",
+  "base": "top-gemini-262721",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "gemini-3.5-flash",
+  "jet_id": 262721,
+  "observable": null
+ },
+ "top-gemini-262721-over_nodirection": {
+  "use_case": "top",
+  "base": "top-gemini-262721",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "gemini-3.5-flash",
+  "jet_id": 262721,
+  "observable": null
+ },
+ "top-gemini-262721-contradiction": {
+  "use_case": "top",
+  "base": "top-gemini-262721",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "gemini-3.5-flash",
+  "jet_id": 262721,
+  "observable": null
+ },
+ "top-gemini-351264-original": {
+  "use_case": "top",
+  "base": "top-gemini-351264",
+  "perturbation": "original",
+  "target": null,
+  "model": "gemini-3.5-flash",
+  "jet_id": 351264,
+  "observable": null
+ },
+ "top-gemini-351264-ling_garble": {
+  "use_case": "top",
+  "base": "top-gemini-351264",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "gemini-3.5-flash",
+  "jet_id": 351264,
+  "observable": null
+ },
+ "top-gemini-351264-phys_direction": {
+  "use_case": "top",
+  "base": "top-gemini-351264",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 351264,
+  "observable": "C2_double_b1"
+ },
+ "top-gemini-351264-phys_wrong": {
+  "use_case": "top",
+  "base": "top-gemini-351264",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 351264,
+  "observable": null
+ },
+ "top-gemini-351264-phys_overreach": {
+  "use_case": "top",
+  "base": "top-gemini-351264",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 351264,
+  "observable": null
+ },
+ "top-gemini-351264-over_nodecision": {
+  "use_case": "top",
+  "base": "top-gemini-351264",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "gemini-3.5-flash",
+  "jet_id": 351264,
+  "observable": null
+ },
+ "top-gemini-351264-over_nodirection": {
+  "use_case": "top",
+  "base": "top-gemini-351264",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "gemini-3.5-flash",
+  "jet_id": 351264,
+  "observable": null
+ },
+ "top-gemini-351264-contradiction": {
+  "use_case": "top",
+  "base": "top-gemini-351264",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "gemini-3.5-flash",
+  "jet_id": 351264,
+  "observable": null
+ },
+ "top-deepse-208249-original": {
+  "use_case": "top",
+  "base": "top-deepse-208249",
+  "perturbation": "original",
+  "target": null,
+  "model": "deepseek-flash",
+  "jet_id": 208249,
+  "observable": null
+ },
+ "top-deepse-208249-ling_garble": {
+  "use_case": "top",
+  "base": "top-deepse-208249",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "deepseek-flash",
+  "jet_id": 208249,
+  "observable": null
+ },
+ "top-deepse-208249-phys_direction": {
+  "use_case": "top",
+  "base": "top-deepse-208249",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 208249,
+  "observable": "D2_double_b1"
+ },
+ "top-deepse-208249-phys_wrong": {
+  "use_case": "top",
+  "base": "top-deepse-208249",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 208249,
+  "observable": null
+ },
+ "top-deepse-208249-phys_overreach": {
+  "use_case": "top",
+  "base": "top-deepse-208249",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 208249,
+  "observable": null
+ },
+ "top-deepse-208249-over_nodecision": {
+  "use_case": "top",
+  "base": "top-deepse-208249",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "deepseek-flash",
+  "jet_id": 208249,
+  "observable": null
+ },
+ "top-deepse-208249-over_nodirection": {
+  "use_case": "top",
+  "base": "top-deepse-208249",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "deepseek-flash",
+  "jet_id": 208249,
+  "observable": null
+ },
+ "top-deepse-208249-contradiction": {
+  "use_case": "top",
+  "base": "top-deepse-208249",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "deepseek-flash",
+  "jet_id": 208249,
+  "observable": null
+ },
+ "top-deepse-353730-original": {
+  "use_case": "top",
+  "base": "top-deepse-353730",
+  "perturbation": "original",
+  "target": null,
+  "model": "deepseek-flash",
+  "jet_id": 353730,
+  "observable": null
+ },
+ "top-deepse-353730-ling_garble": {
+  "use_case": "top",
+  "base": "top-deepse-353730",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "deepseek-flash",
+  "jet_id": 353730,
+  "observable": null
+ },
+ "top-deepse-353730-phys_direction": {
+  "use_case": "top",
+  "base": "top-deepse-353730",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 353730,
+  "observable": "D2_double_b1"
+ },
+ "top-deepse-353730-phys_wrong": {
+  "use_case": "top",
+  "base": "top-deepse-353730",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 353730,
+  "observable": null
+ },
+ "top-deepse-353730-phys_overreach": {
+  "use_case": "top",
+  "base": "top-deepse-353730",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 353730,
+  "observable": null
+ },
+ "top-deepse-353730-over_nodecision": {
+  "use_case": "top",
+  "base": "top-deepse-353730",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "deepseek-flash",
+  "jet_id": 353730,
+  "observable": null
+ },
+ "top-deepse-353730-over_nodirection": {
+  "use_case": "top",
+  "base": "top-deepse-353730",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "deepseek-flash",
+  "jet_id": 353730,
+  "observable": null
+ },
+ "top-deepse-353730-contradiction": {
+  "use_case": "top",
+  "base": "top-deepse-353730",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "deepseek-flash",
+  "jet_id": 353730,
+  "observable": null
+ },
+ "top-qwen3.-94330-original": {
+  "use_case": "top",
+  "base": "top-qwen3.-94330",
+  "perturbation": "original",
+  "target": null,
+  "model": "qwen3.8-27b",
+  "jet_id": 94330,
+  "observable": null
+ },
+ "top-qwen3.-94330-ling_garble": {
+  "use_case": "top",
+  "base": "top-qwen3.-94330",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "qwen3.8-27b",
+  "jet_id": 94330,
+  "observable": null
+ },
+ "top-qwen3.-94330-phys_direction": {
+  "use_case": "top",
+  "base": "top-qwen3.-94330",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 94330,
+  "observable": "C2_double_b1"
+ },
+ "top-qwen3.-94330-phys_wrong": {
+  "use_case": "top",
+  "base": "top-qwen3.-94330",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 94330,
+  "observable": null
+ },
+ "top-qwen3.-94330-phys_overreach": {
+  "use_case": "top",
+  "base": "top-qwen3.-94330",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 94330,
+  "observable": null
+ },
+ "top-qwen3.-94330-over_nodecision": {
+  "use_case": "top",
+  "base": "top-qwen3.-94330",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "qwen3.8-27b",
+  "jet_id": 94330,
+  "observable": null
+ },
+ "top-qwen3.-94330-over_nodirection": {
+  "use_case": "top",
+  "base": "top-qwen3.-94330",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "qwen3.8-27b",
+  "jet_id": 94330,
+  "observable": null
+ },
+ "top-qwen3.-94330-contradiction": {
+  "use_case": "top",
+  "base": "top-qwen3.-94330",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "qwen3.8-27b",
+  "jet_id": 94330,
+  "observable": null
+ },
+ "top-qwen3.-290818-original": {
+  "use_case": "top",
+  "base": "top-qwen3.-290818",
+  "perturbation": "original",
+  "target": null,
+  "model": "qwen3.8-27b",
+  "jet_id": 290818,
+  "observable": null
+ },
+ "top-qwen3.-290818-ling_garble": {
+  "use_case": "top",
+  "base": "top-qwen3.-290818",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "qwen3.8-27b",
+  "jet_id": 290818,
+  "observable": null
+ },
+ "top-qwen3.-290818-phys_direction": {
+  "use_case": "top",
+  "base": "top-qwen3.-290818",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 290818,
+  "observable": "C2_double_b1"
+ },
+ "top-qwen3.-290818-phys_wrong": {
+  "use_case": "top",
+  "base": "top-qwen3.-290818",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 290818,
+  "observable": null
+ },
+ "top-qwen3.-290818-phys_overreach": {
+  "use_case": "top",
+  "base": "top-qwen3.-290818",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 290818,
+  "observable": null
+ },
+ "top-qwen3.-290818-over_nodecision": {
+  "use_case": "top",
+  "base": "top-qwen3.-290818",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "qwen3.8-27b",
+  "jet_id": 290818,
+  "observable": null
+ },
+ "top-qwen3.-290818-over_nodirection": {
+  "use_case": "top",
+  "base": "top-qwen3.-290818",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "qwen3.8-27b",
+  "jet_id": 290818,
+  "observable": null
+ },
+ "top-qwen3.-290818-contradiction": {
+  "use_case": "top",
+  "base": "top-qwen3.-290818",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "qwen3.8-27b",
+  "jet_id": 290818,
+  "observable": null
+ },
+ "ad-gemini-126208-original": {
+  "use_case": "ad",
+  "base": "ad-gemini-126208",
+  "perturbation": "original",
+  "target": null,
+  "model": "gemini-3.5-flash",
+  "jet_id": 126208,
+  "observable": null
+ },
+ "ad-gemini-126208-ling_garble": {
+  "use_case": "ad",
+  "base": "ad-gemini-126208",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "gemini-3.5-flash",
+  "jet_id": 126208,
+  "observable": null
+ },
+ "ad-gemini-126208-phys_direction": {
+  "use_case": "ad",
+  "base": "ad-gemini-126208",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 126208,
+  "observable": "C2_double_b1"
+ },
+ "ad-gemini-126208-phys_wrong": {
+  "use_case": "ad",
+  "base": "ad-gemini-126208",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 126208,
+  "observable": null
+ },
+ "ad-gemini-126208-phys_overreach": {
+  "use_case": "ad",
+  "base": "ad-gemini-126208",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 126208,
+  "observable": null
+ },
+ "ad-gemini-126208-over_nodecision": {
+  "use_case": "ad",
+  "base": "ad-gemini-126208",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "gemini-3.5-flash",
+  "jet_id": 126208,
+  "observable": null
+ },
+ "ad-gemini-126208-over_nodirection": {
+  "use_case": "ad",
+  "base": "ad-gemini-126208",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "gemini-3.5-flash",
+  "jet_id": 126208,
+  "observable": null
+ },
+ "ad-gemini-126208-contradiction": {
+  "use_case": "ad",
+  "base": "ad-gemini-126208",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "gemini-3.5-flash",
+  "jet_id": 126208,
+  "observable": null
+ },
+ "ad-gemini-13865-original": {
+  "use_case": "ad",
+  "base": "ad-gemini-13865",
+  "perturbation": "original",
+  "target": null,
+  "model": "gemini-3.5-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-gemini-13865-ling_garble": {
+  "use_case": "ad",
+  "base": "ad-gemini-13865",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "gemini-3.5-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-gemini-13865-phys_direction": {
+  "use_case": "ad",
+  "base": "ad-gemini-13865",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 13865,
+  "observable": "C2_double_b1"
+ },
+ "ad-gemini-13865-phys_wrong": {
+  "use_case": "ad",
+  "base": "ad-gemini-13865",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-gemini-13865-phys_overreach": {
+  "use_case": "ad",
+  "base": "ad-gemini-13865",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "gemini-3.5-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-gemini-13865-over_nodecision": {
+  "use_case": "ad",
+  "base": "ad-gemini-13865",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "gemini-3.5-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-gemini-13865-over_nodirection": {
+  "use_case": "ad",
+  "base": "ad-gemini-13865",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "gemini-3.5-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-gemini-13865-contradiction": {
+  "use_case": "ad",
+  "base": "ad-gemini-13865",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "gemini-3.5-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-deepse-13865-original": {
+  "use_case": "ad",
+  "base": "ad-deepse-13865",
+  "perturbation": "original",
+  "target": null,
+  "model": "deepseek-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-deepse-13865-ling_garble": {
+  "use_case": "ad",
+  "base": "ad-deepse-13865",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "deepseek-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-deepse-13865-phys_direction": {
+  "use_case": "ad",
+  "base": "ad-deepse-13865",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 13865,
+  "observable": "C2_double_b1"
+ },
+ "ad-deepse-13865-phys_wrong": {
+  "use_case": "ad",
+  "base": "ad-deepse-13865",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-deepse-13865-phys_overreach": {
+  "use_case": "ad",
+  "base": "ad-deepse-13865",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-deepse-13865-over_nodecision": {
+  "use_case": "ad",
+  "base": "ad-deepse-13865",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "deepseek-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-deepse-13865-over_nodirection": {
+  "use_case": "ad",
+  "base": "ad-deepse-13865",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "deepseek-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-deepse-13865-contradiction": {
+  "use_case": "ad",
+  "base": "ad-deepse-13865",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "deepseek-flash",
+  "jet_id": 13865,
+  "observable": null
+ },
+ "ad-deepse-355460-original": {
+  "use_case": "ad",
+  "base": "ad-deepse-355460",
+  "perturbation": "original",
+  "target": null,
+  "model": "deepseek-flash",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-deepse-355460-ling_garble": {
+  "use_case": "ad",
+  "base": "ad-deepse-355460",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "deepseek-flash",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-deepse-355460-phys_direction": {
+  "use_case": "ad",
+  "base": "ad-deepse-355460",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 355460,
+  "observable": "D2_double_b1"
+ },
+ "ad-deepse-355460-phys_wrong": {
+  "use_case": "ad",
+  "base": "ad-deepse-355460",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-deepse-355460-phys_overreach": {
+  "use_case": "ad",
+  "base": "ad-deepse-355460",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "deepseek-flash",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-deepse-355460-over_nodecision": {
+  "use_case": "ad",
+  "base": "ad-deepse-355460",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "deepseek-flash",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-deepse-355460-over_nodirection": {
+  "use_case": "ad",
+  "base": "ad-deepse-355460",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "deepseek-flash",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-deepse-355460-contradiction": {
+  "use_case": "ad",
+  "base": "ad-deepse-355460",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "deepseek-flash",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-qwen3.-355460-original": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-355460",
+  "perturbation": "original",
+  "target": null,
+  "model": "qwen3.8-27b",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-qwen3.-355460-ling_garble": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-355460",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "qwen3.8-27b",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-qwen3.-355460-phys_direction": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-355460",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 355460,
+  "observable": "D2_double_b1"
+ },
+ "ad-qwen3.-355460-phys_wrong": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-355460",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-qwen3.-355460-phys_overreach": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-355460",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-qwen3.-355460-over_nodecision": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-355460",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "qwen3.8-27b",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-qwen3.-355460-over_nodirection": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-355460",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "qwen3.8-27b",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-qwen3.-355460-contradiction": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-355460",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "qwen3.8-27b",
+  "jet_id": 355460,
+  "observable": null
+ },
+ "ad-qwen3.-324110-original": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-324110",
+  "perturbation": "original",
+  "target": null,
+  "model": "qwen3.8-27b",
+  "jet_id": 324110,
+  "observable": null
+ },
+ "ad-qwen3.-324110-ling_garble": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-324110",
+  "perturbation": "ling_garble",
+  "target": "linguistic_realization",
+  "model": "qwen3.8-27b",
+  "jet_id": 324110,
+  "observable": null
+ },
+ "ad-qwen3.-324110-phys_direction": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-324110",
+  "perturbation": "phys_direction",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 324110,
+  "observable": "C2_double_b1"
+ },
+ "ad-qwen3.-324110-phys_wrong": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-324110",
+  "perturbation": "phys_wrong",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 324110,
+  "observable": null
+ },
+ "ad-qwen3.-324110-phys_overreach": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-324110",
+  "perturbation": "phys_overreach",
+  "target": "physical_soundness",
+  "model": "qwen3.8-27b",
+  "jet_id": 324110,
+  "observable": null
+ },
+ "ad-qwen3.-324110-over_nodecision": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-324110",
+  "perturbation": "over_nodecision",
+  "target": "overall_satisfaction",
+  "model": "qwen3.8-27b",
+  "jet_id": 324110,
+  "observable": null
+ },
+ "ad-qwen3.-324110-over_nodirection": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-324110",
+  "perturbation": "over_nodirection",
+  "target": "overall_satisfaction",
+  "model": "qwen3.8-27b",
+  "jet_id": 324110,
+  "observable": null
+ },
+ "ad-qwen3.-324110-contradiction": {
+  "use_case": "ad",
+  "base": "ad-qwen3.-324110",
+  "perturbation": "contradiction",
+  "target": null,
+  "model": "qwen3.8-27b",
+  "jet_id": 324110,
+  "observable": null
+ }
+}

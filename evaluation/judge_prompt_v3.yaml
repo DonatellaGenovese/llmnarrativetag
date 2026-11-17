@@ -1,0 +1,185 @@
+# LLM-as-a-judge prompt, top tagging. DRAFT for review (2026-11-16), not used
+# by any run yet; judge-v2 (judge_prompt.yaml) stays as it was and runnable.
+#
+# Same format and input as judge-v2: the narrative alone, tags stripped, no
+# artefact, no glossary; 0-3 anchored scale; reason first, score after.
+# What changes (decided 2026-11-16):
+#   * Internal Consistency is dropped: both human annotators gave 3 to all 20
+#     v16 items and the judges 2.94-3.00; the contradictions it targeted are
+#     mostly blocked upstream by the verifier.
+#   * Physical Soundness is added: correctness of the physical readings caps
+#     the score, and a 3 needs the readings tied into a physical picture of
+#     the jet that follows the reported contributions.
+#   * Overall Satisfaction is trimmed to understanding the decision: what the
+#     verifier already guarantees (score standing, rarity words) and the
+#     interpretive account (now dimension 2) are out of its anchors.
+id: judge-v3
+dimensions: [linguistic_realization, physical_soundness, overall_satisfaction]
+
+system: |
+  You are an expert evaluator of natural-language explanations. You score a
+  single explanation on three independent quality dimensions using a shared 0-3
+  agreement scale. You reason before you score, and you return only JSON.
+
+task: |
+  The narrative below explains why a machine-learning model assigned a jet to a
+  particular class in a high-energy-physics tagging task.
+
+  <narrative>
+  {narrative}
+  </narrative>
+
+  # GLOBAL SCOPE
+
+  Dimension 2 assesses the physics of the interpretation, and only it.
+  Dimensions 1 and 3 do not: for them, read physics clauses such as "low values
+  favour two-pronged structure" as prose, never as claims to validate.
+
+  Numbers, tag structure, completeness, and the threshold-fixed interpretive
+  words are deterministically verified upstream for the leading observables — do
+  not re-check them. Every jet narrated here also passes a fidelity gate, so a
+  moderate gap between the reported score and the reconstructed one, or a low
+  reconstruction percentile, is expected variance and not a defect.
+
+  # HOW THE INPUT IS STRUCTURED, SO YOU DO NOT PENALISE FIXED PROPERTIES
+
+  All percentile and rarity statistics are reported against the OTHER, non-
+  predicted class only; the predicted-class version does not exist in the source
+  data. A narrative that compares a value only to the other class is using the
+  full information available, not withholding anything. Percentiles that read
+  "backwards" relative to the decision are not a shortfall either.
+
+  Contributions point both ways in almost every jet: some observables push
+  towards the class that was chosen and some against it, and the decision is the
+  sum, not a majority. An explanation reporting a contribution that points away
+  from the chosen class is doing its job.
+
+  Two independent frames both use "high" and "low", and they mean different
+  things:
+
+    (i)  POSITION — where this jet's value sits in the other class's range,
+         e.g. "this value sits high within the QCD class". About this jet.
+    (ii) PHYSICS — what the observable means in general, e.g. "low values
+         favour two-pronged structure". About the observable, not this jet.
+
+  The same observable can be "high" in (i) and discussed under "low values" in
+  (ii) in adjacent sentences with no error whatsoever. How unusual a value is
+  uses a separate vocabulary — extreme, unusual, ordinary — which never collides
+  with either frame.
+
+  The narrative reports observable by observable and does not compute sums,
+  ratios, comparisons or counterfactuals. That is the reporting style it was
+  required to follow, not a shortfall: do not expect or reward computed
+  arguments. It also repeats a similar sentence shape for each observable
+  because the same five facts were demanded for each; that repetition is imposed
+  by the task and is not a defect of the writing.
+
+  # SCALE
+
+  3 = strongly agree, 2 = somewhat agree, 1 = somewhat disagree, 0 = strongly
+  disagree.
+
+  Score the three dimensions INDEPENDENTLY. Do not let a strength or weakness in
+  one raise or lower another. Judge each only against its own statement, anchors
+  and scope.
+
+  ## 1. Linguistic Realization (fluency and clarity)
+
+  "The explanation is fluent and clearly written: the language is natural,
+  grammatical, and unambiguous."
+
+    3  Fluent and grammatical throughout; sentences connect smoothly and every
+       statement is unambiguous.
+    2  Mostly fluent and clear; minor stiffness or awkward phrasing, nothing
+       that impedes reading.
+    1  Noticeably stilted or ambiguous in places; requires rereading.
+    0  Disfluent, ungrammatical, or ambiguous enough that meaning is hard to
+       recover.
+
+  Scope: rate ONLY wording, grammar, flow and unambiguity. If a position/physics
+  "high"-"low" juxtaposition is genuinely confusing on first read, that is a fair
+  ambiguity issue here. Do not penalise the repeated sentence shape described
+  above.
+
+  ## 2. Physical Soundness
+
+  "The physical interpretations are correct, and they help a physicist see what
+  kind of jet structure lies behind the decision."
+
+    3  Every physical reading is correct and applied to this jet consistently
+       with whether the narrative says its value is high or low, and the
+       leading observables are tied together into a physical picture of this
+       jet (e.g. a massive jet with three hard prongs) that makes the decision
+       understandable.
+    2  Every physical reading is correct, but the readings stay isolated, one
+       observable at a time, and the reader has to assemble the picture; or at
+       most one loose, imprecise phrasing.
+    1  One clear physical error, or almost no physical interpretation at all.
+    0  Several physical errors, or the physical account of this jet is wrong in
+       its main line.
+
+  Scope: judge only the physics of the interpretation, using standard
+  jet-substructure knowledge. A clear physical error is one of:
+    - High/low reading. The narrative says a value is high and then describes
+      THIS jet with what low values mean, or the reverse. A general statement
+      such as "low values favour two-pronged structure" next to a high value is
+      NOT an error (frame (ii) above); it is one only when the low-value
+      reading is applied to this jet.
+    - Wrong physics for the observable, e.g. a low tau32 read as two-pronged,
+      or constituent multiplicity read as a count of prongs.
+    - Overreach. An interpretation asserted as certain fact about this jet
+      ("this jet is a top decaying to bW"), or physics the narrative was not
+      given (mass values, decay mechanisms). Saying that a value is consistent
+      with, or typical of, a top decay or QCD radiation is fine.
+  A physical picture must follow the contributions the narrative reports, not
+  the reader's expectations. When an observable pushes against what its physics
+  would suggest (e.g. a low mass on a jet tagged top), a narrative that says so
+  plainly is sound; one that bends the physics to fit the decision is not.
+  Whether the tagger's decision is right is out of scope: the narrative explains
+  the decision, not the truth. Do not re-grade fluency.
+
+  ## 3. Overall Satisfaction (helpfulness for understanding the decision)
+
+  "Overall, I am satisfied with this explanation: it helped me understand why
+  the model made its decision."
+
+  A helpful narrative, within the reporting style above: (a) makes clear which
+  observables drive the decision and in what order of weight; (b) separates
+  what pushes towards the decision from what pushes against it; (c) conveys how
+  adequately the decomposition accounts for the decision, flagging a weak
+  reconstruction honestly where there is one.
+
+    3  Delivers (a)-(c): the reader comes away knowing what drove the decision,
+       how strongly, and how far to trust the decomposition. A jet whose
+       decomposition is weak may be brief and lead with that limitation and
+       still score 3.
+    2  Conveys the main drivers and their directions, but leaves their relative
+       weight unclear, OR never contextualises adequacy.
+    1  Touches the decision but leaves the reasoning thin: drivers not clearly
+       separated by direction or weight, or the decision asserted more than
+       explained.
+    0  Gives no meaningful understanding of why the decision was made.
+
+  Scope: judge how well the reader is served in understanding the decision,
+  using only what was available to the narrative and within its reporting
+  style. The physical content is judged in dimension 2 and the language in
+  dimension 1: do not re-grade them. Do NOT penalise missing predicted-class
+  statistics, the absence of sums or counterfactuals, a reconstruction gap in
+  itself, or brevity where the decomposition is weak. A narrative that flags
+  weak adequacy honestly is MORE satisfying, not less.
+
+  # INSTRUCTIONS
+
+  Read the whole narrative before scoring. For each dimension write one or two
+  sentences of justification and then the integer score — reason first, score
+  after. For any score of 1 or 0, quote the exact span of the narrative that
+  drove it, verbatim, in `evidence`; leave `evidence` as an empty string for
+  scores of 2 or 3.
+
+  Output only the JSON object below and nothing else.
+
+  {
+    "linguistic_realization": {"reason": "...", "evidence": "", "score": 0},
+    "physical_soundness":     {"reason": "...", "evidence": "", "score": 0},
+    "overall_satisfaction":   {"reason": "...", "evidence": "", "score": 0}
+  }

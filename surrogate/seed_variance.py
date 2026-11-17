@@ -53,7 +53,8 @@ def _metrics(y_clip, y_raw, pred, truth_top, part_top, ado_idx) -> Dict[str, flo
     return out
 
 
-def run(config_path: Path, out_dir: Path, seeds: List[int], max_jets: int | None) -> dict:
+def run(config_path: Path, out_dir: Path, seeds: List[int], max_jets: int | None,
+        feat_dir: Path | None = None) -> dict:
     from interpret.glassbox import ExplainableBoostingRegressor
     from xgboost import XGBRegressor
 
@@ -61,7 +62,7 @@ def run(config_path: Path, out_dir: Path, seeds: List[int], max_jets: int | None
     obs = list(cfg["observables"])
     fit = cfg["fit"]
     repo = config_path.resolve().parents[2]
-    base = repo / "surrogate/outputs/top/features"
+    base = feat_dir or repo / "surrogate/outputs/top/features"
 
     def load(name):
         df = pd.read_parquet(base / f"features_{name}.parquet")
@@ -194,8 +195,11 @@ def main():
     p.add_argument("--out-dir", type=Path, default=repo / "surrogate/outputs/top/seed_variance")
     p.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44, 45, 46])
     p.add_argument("--max-jets", type=int, default=None)
+    p.add_argument("--feat-dir", type=Path, default=None,
+                   help="Directory with features_{train,val,test}.parquet "
+                        "(default surrogate/outputs/top/features)")
     args = p.parse_args()
-    run(args.config, args.out_dir, args.seeds, args.max_jets)
+    run(args.config, args.out_dir, args.seeds, args.max_jets, args.feat_dir)
 
 
 if __name__ == "__main__":

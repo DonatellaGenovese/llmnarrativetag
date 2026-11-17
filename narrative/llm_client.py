@@ -30,11 +30,16 @@ BACKEND_VERTEX = "vertex"
 # off differ. Called over urllib rather than the openai SDK on purpose: the
 # conda environment here also carries the fitted surrogate stack, and is not
 # worth perturbing for thirty lines of HTTP.
+#
+# `vllm` is a model we serve ourselves on Leonardo (scripts/slurm/vllm_generate.sbatch):
+# no key, and the base URL from VLLM_BASE_URL, default the server the job starts
+# on localhost. The model name is vLLM's --served-model-name.
 OPENAI_BACKENDS = {
     "deepseek": ("https://api.deepseek.com/v1", "DEEPSEEK_API_KEY"),
     "groq": ("https://api.groq.com/openai/v1", "GROQ_API_KEY"),
-    "ollama": ("https://ollama.com/v1", "OLLAMA_API_KEY"),
+    "vllm": ("http://localhost:8000/v1", None),
 }
+BASE_URL_ENV = {"vllm": "VLLM_BASE_URL"}
 
 
 @dataclass
@@ -71,6 +76,7 @@ class LLMClient:
         location: Optional[str] = None,
         thinking_budget: Optional[int] = None,
         reasoning_effort: Optional[str] = None,
+        extra_body: Optional[Dict[str, Any]] = None,
     ):
         if backend not in (BACKEND_AISTUDIO, BACKEND_VERTEX) and backend not in OPENAI_BACKENDS:
             raise ValueError(f"unknown backend {backend!r}")
@@ -88,10 +94,16 @@ class LLMClient:
         # sent `none`, so the honest setting for it is the floor rather than a
         # request it cannot honour.
         self.reasoning_effort = reasoning_effort
+        # Extra request fields for OpenAI-compatible servers, merged into the
+        # body as given. For vLLM-served Qwen, {"chat_template_kwargs":
+        # {"enable_thinking": false}} is how its thinking mode is switched off.
+        self.extra_body = dict(extra_body or {})
         # Set once a model has refused thinking_config, so the whole run does not
         # pay for the same rejected request on every jet.
         self._thinking_unsupported = False
         self._client = None  # built lazily so importing needs no credentials
+        import threading
+        self._client_lock = threading.Lock()
 
     # -- client ------------------------------------------------------------
 
@@ -129,8 +141,15 @@ class LLMClient:
 
     @property
     def client(self):
+        # Built once under a lock: with --workers > 1 several threads reach here
+        # together, and without the lock each built its own client, the losers
+        # were garbage-collected and closed, and their in-flight calls failed
+        # with "Cannot send a request, as the client has been closed"
+        # (ad100 run, 2026-11-11).
         if self._client is None:
-            self._client = self._build_client()
+            with self._client_lock:
+                if self._client is None:
+                    self._client = self._build_client()
         return self._client
 
     # -- generation --------------------------------------------------------
@@ -143,8 +162,9 @@ class LLMClient:
         import urllib.request
 
         base, env_var = OPENAI_BACKENDS[self.backend]
-        key = os.environ.get(env_var)
-        if not key:
+        base = os.environ.get(BASE_URL_ENV.get(self.backend, ""), "") or base
+        key = os.environ.get(env_var) if env_var else None
+        if env_var and not key:
             raise RuntimeError(f"{env_var} is not set, required by backend {self.backend!r}")
 
         body = {
@@ -169,11 +189,15 @@ class LLMClient:
         if effort is not None:
             body["reasoning_effort"] = effort
             control = f"effort={effort}"
+        if self.extra_body:
+            body.update(self.extra_body)
+            control += " extra=" + json.dumps(self.extra_body, sort_keys=True)
 
+        headers = {"Content-Type": "application/json"}
+        if key:
+            headers["Authorization"] = f"Bearer {key}"
         req = urllib.request.Request(
-            f"{base}/chat/completions",
-            data=json.dumps(body).encode(),
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            f"{base}/chat/completions", data=json.dumps(body).encode(), headers=headers,
         )
         with urllib.request.urlopen(req, timeout=600) as resp:
             payload = json.load(resp)
@@ -194,7 +218,8 @@ class LLMClient:
         # count it inside `completion_tokens`. Recorded by length so the
         # asymmetry is quantified rather than merely declared; never appended to
         # the narrative.
-        reasoning = choice["message"].get("reasoning") or ""
+        # (`reasoning_content` is vLLM's name for it.)
+        reasoning = choice["message"].get("reasoning") or choice["message"].get("reasoning_content") or ""
         if reasoning:
             usage["reasoning_chars"] = len(reasoning)
 
@@ -210,7 +235,34 @@ class LLMClient:
             thinking_control=control,
         )
 
+    # Transient provider errors are retried with exponential backoff instead of
+    # ending the jet: a 429 from Vertex at four concurrent jets (ad100 run,
+    # 2026-11-11) otherwise marks the jet `error` and the whole block has to be
+    # redone. Only rate limits, overload and timeouts are retried; a 400 or an
+    # auth failure is raised at once.
+    RETRY_MARKERS = ("429", "RESOURCE_EXHAUSTED", "rate limit", "503", "UNAVAILABLE",
+                     "overloaded", "500 INTERNAL", "502", "504", "timed out", "timeout")
+    RETRY_DELAYS = (5, 15, 30, 60, 120, 240)
+
     def generate(
+        self,
+        system: str,
+        prompt: str,
+        seed: Optional[int] = None,
+        temperature: Optional[float] = None,
+    ) -> Completion:
+        import time
+
+        for delay in self.RETRY_DELAYS + (None,):
+            try:
+                return self._generate_once(system, prompt, seed, temperature)
+            except Exception as exc:
+                msg = str(exc)
+                if delay is None or not any(m.lower() in msg.lower() for m in self.RETRY_MARKERS):
+                    raise
+                time.sleep(delay)
+
+    def _generate_once(
         self,
         system: str,
         prompt: str,
@@ -249,7 +301,7 @@ class LLMClient:
             control = "applied" if want is not None else "default"
             applied = want
         except Exception as exc:
-            # gemini-2.5-pro refuses thinking_config with a 400. Retry without it
+            # Some models refuse thinking_config with a 400. Retry without it
             # rather than abort: the run continues, and the record shows that the
             # request was not honoured.
             if want is None or "thinking" not in str(exc).lower():
@@ -304,4 +356,5 @@ class LLMClient:
             location=llm.get("location"),
             thinking_budget=llm.get("thinking_budget"),
             reasoning_effort=llm.get("reasoning_effort"),
+            extra_body=llm.get("extra_body"),
         )

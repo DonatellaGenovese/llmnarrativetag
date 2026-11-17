@@ -1,0 +1,110 @@
+{
+ "top": {
+  "jets": [
+   262721,
+   351264,
+   208249,
+   353730,
+   94330,
+   290818,
+   204637
+  ],
+  "cells": {
+   "262721": "top_correct",
+   "351264": "top_correct",
+   "208249": "qcd_correct",
+   "353730": "qcd_correct",
+   "94330": "top_wrong",
+   "290818": "top_wrong",
+   "204637": "qcd_wrong",
+   "89245": "top_correct",
+   "134133": "top_correct",
+   "245194": "top_correct",
+   "393116": "top_correct",
+   "26009": "qcd_correct",
+   "206083": "qcd_correct",
+   "258824": "qcd_correct",
+   "337930": "qcd_correct",
+   "1370": "top_wrong",
+   "119505": "top_wrong",
+   "350869": "top_wrong",
+   "230438": "qcd_wrong",
+   "297277": "qcd_wrong"
+  },
+  "models": [
+   "gemini-3.5-flash",
+   "deepseek-flash",
+   "qwen3.8-27b"
+  ],
+  "block": "pilot100",
+  "extra_jets": [
+   89245,
+   134133,
+   245194,
+   393116,
+   26009,
+   206083,
+   258824,
+   337930,
+   1370,
+   119505,
+   350869,
+   230438,
+   297277
+  ]
+ },
+ "ad": {
+  "jets": [
+   126208,
+   383500,
+   13865,
+   202690,
+   106885,
+   355460,
+   324110
+  ],
+  "cells": {
+   "126208": "top flagged",
+   "383500": "top flagged",
+   "13865": "QCD false alarm",
+   "202690": "QCD false alarm",
+   "106885": "QCD rejected",
+   "355460": "QCD rejected",
+   "324110": "top missed",
+   "59286": "top flagged",
+   "101963": "top flagged",
+   "113218": "top flagged",
+   "304668": "top flagged",
+   "32186": "QCD false alarm",
+   "175477": "QCD false alarm",
+   "296842": "QCD false alarm",
+   "347111": "QCD false alarm",
+   "226691": "QCD rejected",
+   "269937": "QCD rejected",
+   "383353": "QCD rejected",
+   "332818": "top missed",
+   "387797": "top missed"
+  },
+  "models": [
+   "gemini-3.5-flash",
+   "deepseek-flash",
+   "qwen3.8-27b"
+  ],
+  "block": "pilot100",
+  "extra_jets": [
+   59286,
+   101963,
+   113218,
+   304668,
+   32186,
+   175477,
+   296842,
+   347111,
+   226691,
+   269937,
+   383353,
+   332818,
+   387797
+  ]
+ }
+}

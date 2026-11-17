@@ -1,0 +1,5 @@
+#!/bin/bash
+# Stand-in for the `weaver` command, so that particle_transformer/train_*.sh,
+# vendored verbatim, train with a fixed seed without being edited. Put this
+# directory first on PATH and export SEED; part1_finetune.sbatch does both.
+exec python "$(dirname "$(readlink -f "$0")")/../weaver_seeded.py" "$@"

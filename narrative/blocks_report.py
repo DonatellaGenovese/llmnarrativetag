@@ -33,12 +33,8 @@ import yaml
 from .generator import load_glossary
 from .verifier import verify
 
-MODELS = [
-    "gemini-3.5-flash",
-    "deepseek-v4-flash",
-    "gemini-3.5-flash-lite",
-    "gpt-oss-120b",
-]
+# Filled from the config's `generators` (or --models) in main().
+MODELS: List[str] = []
 FAMILIES = {
     "Faith": ("wrong_value",),
     "Comp": ("missing_tag",),
@@ -46,6 +42,10 @@ FAMILIES = {
     "NoBare": ("untagged_number",),
     "Read": ("wrong_reading",),
 }
+# Anomaly detection only (`verifier.banned_terms` in the config): no particle,
+# process or signal named. Added to FAMILIES in main() when the config has terms.
+IDENT_FAMILY = ("Ident", ("identity_claim",))
+BANNED: List[str] = []
 
 
 def wilson(k: int, n: int, z: float = 1.96) -> tuple:
@@ -67,24 +67,57 @@ def mcnemar(b: int, c: int) -> float:
     return min(1.0, 2 * sum(comb(n, i) for i in range(k + 1)) / 2 ** n)
 
 
-def score_file(path: Path, glossary: dict) -> Dict[int, dict]:
+def pick_attempt(record: dict, which: str = "final"):
+    """The attempt a report reads: `first`, what the model wrote unaided, or
+    `final`, the last one made, which under the retry loop is the delivered
+    narrative when one passed (the loop stops there) and the last rewrite when
+    none did. With max_attempts 1 the two are the same. None if no attempt
+    produced text."""
+    atts = [a for a in record.get("attempts") or [] if "completion" in a]
+    if not atts:
+        return None
+    if which == "first":
+        return atts[0] if record["attempts"][0] is atts[0] else None
+    return atts[-1]
+
+
+def score_file(path: Path, glossary: dict, which: str = "final") -> Dict[int, dict]:
     """Per-jet family verdicts for one run, from a fresh verification."""
     out: Dict[int, dict] = {}
     for line in path.read_text().splitlines():
         r = json.loads(line)
         if not r["attempts"]:
             continue  # abstained: no narrative was requested
-        att = r["attempts"][0]
+        att = pick_attempt(r, which) or {}
         if "completion" not in att:
             # The call itself failed — a 429, a timeout — so there is no text to
             # judge. Counting it as a failure would charge the model for the
             # provider's quota; counting it as a pass is worse. It is excluded,
             # and `n` in the report drops accordingly.
             continue
-        rep = verify(att["completion"]["text"], r["artefact"], glossary=glossary)
+        rep = verify(att["completion"]["text"], r["artefact"], glossary=glossary, banned_terms=BANNED)
         kinds = {v.kind for v in rep.violations}
         out[r["jet_id"]] = {f: not (kinds & set(ks)) for f, ks in FAMILIES.items()}
         out[r["jet_id"]]["TOTAL"] = rep.ok
+    return out
+
+
+def attempts_to_pass(path: Path, glossary: dict) -> Dict[int, int]:
+    """Per narrated jet: the number of the first attempt that passes a fresh
+    verification (1 = unaided), or 0 if none of the attempts made does. Jets
+    whose call produced no text at all are left out, as in `score_file`."""
+    out: Dict[int, int] = {}
+    for line in path.read_text().splitlines():
+        r = json.loads(line)
+        atts = [a for a in r.get("attempts") or [] if "completion" in a]
+        if not atts:
+            continue
+        out[r["jet_id"]] = 0
+        for k, att in enumerate(atts, start=1):
+            if verify(att["completion"]["text"], r["artefact"], glossary=glossary,
+                      banned_terms=BANNED).ok:
+                out[r["jet_id"]] = k
+                break
     return out
 
 
@@ -99,9 +132,20 @@ def main() -> None:
     p.add_argument("--runs", type=Path, nargs="+", default=None,
                    help="Directories to search for <block>_<model>.jsonl "
                         "(default: the narratives dir from the config)")
+    p.add_argument("--models", nargs="+", default=None,
+                   help="Run names to report (default: `generators` in the config). "
+                        "The published v16: gemini-3.5-flash deepseek-v4-flash "
+                        "gemini-3.5-flash-lite gpt-oss-120b")
+    p.add_argument("--attempt", choices=["first", "final"], default="final",
+                   help="first: the model unaided (the published v16 contract); "
+                        "final: the delivered narrative after the retry loop")
     args = p.parse_args()
 
     cfg = yaml.safe_load(args.config.read_text())
+    MODELS[:] = args.models or [g["name"] for g in cfg["generators"]]
+    BANNED[:] = list((cfg.get("verifier") or {}).get("banned_terms") or [])
+    if BANNED:
+        FAMILIES[IDENT_FAMILY[0]] = IDENT_FAMILY[1]
     glossary = load_glossary(repo / cfg["glossary"]["path"], require_reviewed=True)
     run_dirs = args.runs or [repo / cfg["outputs"]["narratives"]]
 
@@ -112,11 +156,11 @@ def main() -> None:
             for d in run_dirs:
                 f = d / f"{blk}_{model}.jsonl"
                 if f.exists():
-                    data[model][blk] = score_file(f, glossary)
+                    data[model][blk] = score_file(f, glossary, args.attempt)
                     break
 
     present = [b for b in args.blocks if any(b in data[m] for m in MODELS)]
-    print(f"blocks pooled: {', '.join(present)}\n")
+    print(f"blocks pooled: {', '.join(present)}   attempt: {args.attempt}\n")
 
     print("POOLED")
     head = "".join(f"{f:>8}" for f in list(FAMILIES) + ["TOTAL"])
@@ -170,6 +214,33 @@ def main() -> None:
             pv = mcnemar(x, y)
             verdict = "significant" if pv < 0.05 else "not significant"
             print(f"  {a:<24} vs {b:<24}{x:>4}/{y:<4} n={len(keys):<4} p={pv:.4f}  {verdict}")
+
+    # The cost of the refine loop: how many attempts a delivered narrative took.
+    # Only under --attempt final, so the first-attempt report stays as it was.
+    if args.attempt != "final":
+        return
+    max_att = int((cfg.get("llm") or {}).get("max_attempts", 5))
+    print(f"\nATTEMPTS TO DELIVERY  (first attempt that passes, re-verified; "
+          f"mean over the jets delivered within {max_att})")
+    hist_head = "".join(f"{k:>5}" for k in range(1, max_att + 1))
+    print(f"  {'model':<24}{'mean':>6}{'sd':>6}{'deliv':>7}{hist_head}{'fail':>6}")
+    for model in MODELS:
+        ks: List[int] = []
+        for blk in present:
+            for d in run_dirs:
+                f = d / f"{blk}_{model}.jsonl"
+                if f.exists():
+                    ks += list(attempts_to_pass(f, glossary).values())
+                    break
+        if not ks:
+            continue
+        ok = [k for k in ks if k > 0]
+        mean = sum(ok) / len(ok) if ok else float("nan")
+        sd = (math.sqrt(sum((k - mean) ** 2 for k in ok) / (len(ok) - 1))
+              if len(ok) > 1 else float("nan"))
+        hist = "".join(f"{sum(1 for k in ok if k == i):>5}" for i in range(1, max_att + 1))
+        print(f"  {model:<24}{mean:>6.2f}{sd:>6.2f}{len(ok):>4}/{len(ks):<3}{hist}"
+              f"{sum(1 for k in ks if k == 0):>6}")
 
 
 if __name__ == "__main__":

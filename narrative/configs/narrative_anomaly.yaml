@@ -1,0 +1,88 @@
+# Part 3 narrative pipeline — anomaly detection on TopLandscape.
+#
+# The same pipeline as narrative_top.yaml (generators, refinement loop,
+# verifier, reports); `task: anomaly` selects the AD artefact
+# (narrative/artefact_anomaly.py), whose abstention gate is anomaly/gate.py.
+task: anomaly
+dataset: TopLandscape-AD
+
+# The detector being explained: IAD on the frozen ParT latent, signal fraction
+# 10%, detector seed 0 (anomaly/outputs, experiments E1/E2; decided 2026-11-11).
+inputs:
+  # Test jets, with the IAD logit in `t` (never shown to the narrator).
+  features: anomaly/outputs/seed0/surrogate_inputs/iad_f0.1_latent/features_test.parquet
+  # The EBM fitted to the IAD logit on half of val.
+  model: anomaly/outputs/seed0/surrogate/iad_f0.1_latent/ebm.joblib
+  # gate.json + gate_reference.npz: working point (10% background), caveat
+  # factor (x10) and the sorted reference scores the rarities are computed from.
+  gate: anomaly/outputs/seed0/surrogate/iad_f0.1_latent
+  # Background reference for the observables' pct and rarity: the QCD jets of
+  # the selection half of val, the same population the gate ranks against.
+  reference: anomaly/outputs/seed0/surrogate_inputs/iad_f0.1_latent/features_val.parquet
+
+artefact:
+  # Observables reported per jet, ranked by |phi|. null = all of them.
+  top_k: null
+  round:
+    value: 2
+    phi: 2
+    # Rarities and percentiles, in %, two decimals (and never below 0.01).
+    pct: 2
+
+verifier:
+  # The detector never learns what the signal is, so a narrative may say how
+  # the jet differs from the background but not what produced it. Whole-word,
+  # case-insensitive regular expressions; any match is an `identity_claim`
+  # violation (the `Ident` column of the reports). A mass scale such as 173 GeV
+  # needs no entry: any digit outside a tag already fails.
+  #
+  # "top" and "signal" are also ordinary English. On ad100 every hit of the bare
+  # words (27 over five models, all attempts) was "the top five", "near the top
+  # of the range" or the verb ("low tau32 would signal three prongs"), none an
+  # identity claim. So "top" is banned except as a rank or a position, and
+  # "signal" only as a noun: after an article or preposition, or as a modifier.
+  # "W" is matched case-sensitively (the others are not). "on top (of)", the
+  # idiom for "in addition", is not a claim either (deepseek, pilot100 jet 332892).
+  banned_terms:
+    - "(?<!on )top(?!\\s*[-‐‑]?\\s*(?:one|two|three|four|five|six|seven|eight|nine|ten|\\d+|of|end|ranked)\\b)"
+    - "quarks?"
+    - "(?-i:W)"           # the boson; case-sensitive, so "w.r.t." passes
+    - "bosons?"
+    - "(?:the|a|any|as|of|for|with|like)\\s+signal|signals?[-‐‑ ](?:like|jets?|events?|process(?:es)?|hypothes[ie]s|regions?|samples?|models?)"
+    - "decay(s|ing|ed)?"
+    - "hadronic"
+
+glossary:
+  path: narrative/configs/glossary_anomaly.yaml
+  require_reviewed: true
+
+prompt:
+  path: narrative/prompts/prompt_anomaly.yaml
+
+# Same generation settings as narrative_top.yaml, so the two use cases differ
+# only in the artefact, the prompt and the glossary.
+llm:
+  backend: vertex
+  project: null
+  location: global
+  model: gemini-3.5-flash-lite
+  temperature: 0.0
+  seed: 42
+  max_output_tokens: 8192
+  thinking_budget: 0
+  max_attempts: 5
+  retry_mode: refine
+  refine_temperature: 0.2
+  retry_temperature_step: 0.3
+
+# The generators of narrative_top.yaml (see the notes there).
+generators:
+  - {name: gemini-3.5-flash,      backend: vertex,   model: gemini-3.5-flash}
+  - {name: gemini-3.5-flash-lite, backend: vertex,   model: gemini-3.5-flash-lite}
+  - {name: deepseek-flash,        backend: deepseek, model: deepseek-flash}
+  - {name: gpt-oss-120b,          backend: vllm,     model: gpt-oss-120b, reasoning_effort: low}
+  - {name: qwen3.8-27b,           backend: vllm,     model: qwen3.8-27b,
+     extra_body: {chat_template_kwargs: {enable_thinking: false}}}
+
+outputs:
+  narratives: narrative/outputs/anomaly/narratives

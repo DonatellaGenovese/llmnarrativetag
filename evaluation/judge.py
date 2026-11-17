@@ -1,9 +1,13 @@
 """Run the LLM-as-a-judge rubric over an annotation set.
 
-One judge, `claude-sonnet-5`, through the Anthropic SDK, credentialed from
-ANTHROPIC_API_KEY or `~/.anthropic_key`. Eight candidates were piloted across
-four families; the rest were dropped for reading the rubric too coarsely, and
-the pilot verdicts are not kept.
+The judges (2026-11-13) are `zai-glm-5-3` and `mistral-large-4`, through the Mistral API (credential
+MISTRAL_API_KEY or `~/.mistral_key`), and `muse-spark-1.3`, through Meta's Model
+API (credential META_API_KEY or `~/.meta_key`; endpoint META_BASE_URL, default
+https://api.meta.ai/v1). `claude-sonnet-5`, the judge of the earlier runs, is
+no longer used: its Anthropic credit ran out and its verdicts saturated. It
+stays registered so those runs can still be read and resumed. Also available:
+`zai-glm-5-3-flash`, `mistral-large-4`, and `muse-spark-1.3-contributor`, the
+cheaper Muse tier whose prompts and completions Meta may train on.
 
 The judge is not a generator of the narratives being scored, which matters: a
 model grading its own output is the one configuration a judge study cannot use.
@@ -30,6 +34,7 @@ from typing import Dict, List, Optional
 
 import yaml
 
+from narrative.blocks_report import pick_attempt
 from narrative.generator import load_glossary
 
 DIMENSIONS = ("linguistic_realization", "internal_consistency", "overall_satisfaction")
@@ -38,9 +43,30 @@ DIMENSIONS = ("linguistic_realization", "internal_consistency", "overall_satisfa
 # rather than a knob. Reasoning was measured and it did not help: it costs
 # thinking tokens and latency without buying sensitivity, and on the one probe
 # with an unambiguous answer it made the verdict worse.
+#
+# The Mistral-API judges cannot switch reasoning off: GLM 5.3 and Mistral Large 4
+# accept only low, high or max (measured, 2026-11-06). They are pinned to the
+# floor, `low`, and every verdict records the reasoning tokens it spent, so the
+# asymmetry with Sonnet is quantified rather than hidden. None of them shares a
+# family with a generator; Mistral's own DeepSeek is left out for that reason.
 JUDGES = {
     "claude-sonnet-5": {"backend": "anthropic", "model": "claude-sonnet-5", "reasoning": "off"},
+    "zai-glm-5-3": {"backend": "mistral", "model": "zai-glm-5-3", "reasoning": "low",
+                    "reasoning_effort": "low", "min_max_tokens": 8000},
+    "zai-glm-5-3-flash": {"backend": "mistral", "model": "zai-glm-5-3-flash", "reasoning": "low",
+                          "reasoning_effort": "low", "min_max_tokens": 8000},
+    "mistral-large-4": {"backend": "mistral", "model": "mistral-large-4", "reasoning": "low",
+                        "reasoning_effort": "low", "min_max_tokens": 8000},
+    # Meta's Model API, OpenAI-style. Reasoning cannot be switched off either;
+    # `minimal` is its floor (minimal/low/medium/high/xhigh). Not a generator's
+    # family. The contributor tier is Meta's to train on: not the default.
+    "muse-spark-1.3": {"backend": "meta", "model": "muse-spark-1.3", "reasoning": "minimal",
+                       "reasoning_effort": "minimal", "min_max_tokens": 8000},
+    "muse-spark-1.3-contributor": {"backend": "meta", "model": "muse-spark-1.3-contributor",
+                                   "reasoning": "minimal", "reasoning_effort": "minimal",
+                                   "min_max_tokens": 8000},
 }
+DEFAULT_JUDGES = ["zai-glm-5-3", "muse-spark-1.3"]
 
 
 def read_key(env: str, path: str) -> str:
@@ -52,7 +78,7 @@ def read_key(env: str, path: str) -> str:
     return key
 
 
-def parse_verdict(text: str) -> dict:
+def parse_verdict(text: str, dimensions=DIMENSIONS) -> dict:
     """Pull the JSON object out of a reply, tolerating a fenced block around it.
 
     Raises rather than guessing: a verdict that cannot be read is a datum about
@@ -63,7 +89,7 @@ def parse_verdict(text: str) -> dict:
     if not m:
         raise ValueError(f"no JSON object in reply: {text[:200]!r}")
     v = json.loads(m.group(0))
-    for d in DIMENSIONS:
+    for d in dimensions:
         if d not in v:
             raise ValueError(f"missing dimension {d!r}")
         if not isinstance(v[d].get("score"), int) or not 0 <= v[d]["score"] <= 3:
@@ -107,18 +133,110 @@ def call_anthropic(system: str, prompt: str, model: str, max_tokens: int = 2000)
             "stop": r.stop_reason, "thinking": "disabled"}
 
 
+def call_mistral(system: str, prompt: str, model: str, max_tokens: int = 2000,
+                 effort: Optional[str] = None,
+                 url: str = "https://api.mistral.ai/v1/chat/completions",
+                 key_env: str = "MISTRAL_API_KEY", key_path: str = "~/.mistral_key",
+                 provider: str = "mistral") -> dict:
+    """One call to an OpenAI-style chat-completions API: Mistral's (which also
+    serves the Z.ai GLMs) by default, Meta's through `call_meta`.
+
+    Over urllib rather than an SDK, as llm_client does for the OpenAI-style
+    generators. Greedy decoding: temperature 0, and top_p 1 with it, since the
+    API refuses greedy sampling with any other top_p.
+
+    Reasoning models answer with a list of parts, `thinking` and `text`. Only the
+    text is the verdict; the thinking is never parsed, and is recorded by size.
+    """
+    import urllib.error
+    import urllib.request
+
+    body = {
+        "model": model,
+        "messages": [{"role": "system", "content": system},
+                     {"role": "user", "content": prompt}],
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": max_tokens,
+    }
+    if effort is not None:
+        body["reasoning_effort"] = effort
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(body).encode(),
+        headers={"Authorization": f"Bearer {read_key(key_env, key_path)}",
+                 "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=600) as resp:
+            d = json.load(resp)
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"{provider} {model}: HTTP {e.code}: {e.read().decode()[:300]}") from e
+
+    choice = d["choices"][0]
+    content = choice["message"].get("content") or ""
+    thinking_chars = 0
+    if isinstance(content, list):
+        text = "".join(p.get("text", "") for p in content if p.get("type") == "text")
+        thinking_chars = sum(len(json.dumps(p.get("thinking", ""))) for p in content
+                             if p.get("type") == "thinking")
+    else:
+        text = content
+    u = d.get("usage", {}) or {}
+    usage = {"in": u.get("prompt_tokens"), "out": u.get("completion_tokens")}
+    rt = (u.get("completion_tokens_details") or {}).get("reasoning_tokens")
+    if rt is not None:
+        usage["reasoning"] = rt
+    if thinking_chars:
+        usage["thinking_chars"] = thinking_chars
+    return {"text": text, "usage": usage, "stop": choice.get("finish_reason"),
+            "thinking": f"effort={effort}" if effort else "default"}
+
+
+def call_meta(system: str, prompt: str, model: str, max_tokens: int = 2000,
+              effort: Optional[str] = None) -> dict:
+    """Meta's Model API (Muse), OpenAI-style. The base URL is taken from the
+    secondary sources available on 2026-11-13; override it with META_BASE_URL
+    if Meta's own docs say otherwise."""
+    base = os.environ.get("META_BASE_URL", "https://api.meta.ai/v1").rstrip("/")
+    return call_mistral(system, prompt, model, max_tokens, effort,
+                        url=f"{base}/chat/completions", key_env="META_API_KEY",
+                        key_path="~/.meta_key", provider="meta")
+
+
 def judge_one(narrative: str, judge: str, prompt: dict, max_tokens: int) -> dict:
     spec = JUDGES[judge]
     task = prompt["task"].replace("{narrative}", narrative)
+    # Reasoning tokens come out of the same budget as the verdict, so a judge
+    # that cannot switch reasoning off is given a floor high enough that the
+    # JSON is never cut short.
+    max_tokens = max(max_tokens, spec.get("min_max_tokens", 0))
     t0 = time.time()
-    raw = call_anthropic(prompt["system"].strip(), task, spec["model"], max_tokens)
+    if spec["backend"] == "anthropic":
+        raw = call_anthropic(prompt["system"].strip(), task, spec["model"], max_tokens)
+    elif spec["backend"] == "mistral":
+        raw = call_mistral(prompt["system"].strip(), task, spec["model"], max_tokens,
+                           spec.get("reasoning_effort"))
+    elif spec["backend"] == "meta":
+        raw = call_meta(prompt["system"].strip(), task, spec["model"], max_tokens,
+                        spec.get("reasoning_effort"))
+    else:
+        raise ValueError(f"unknown judge backend {spec['backend']!r}")
     raw["seconds"] = round(time.time() - t0, 1)
     return raw
 
 
 def load_from_runs(runs: Path, block: str, models: List[str], accepted_only: bool,
-                   glossary: Optional[dict] = None) -> Dict[str, dict]:
+                   glossary: Optional[dict] = None, which: str = "final",
+                   banned_terms: tuple = ()) -> Dict[str, dict]:
     """Narratives straight out of a sweep, keyed `<model-short>-<jet_id>`.
+
+    `which` picks the attempt read from each jet. `final` is the delivered
+    narrative, the last attempt of the retry loop, which is the one that passed
+    when any did. `first` is what the model wrote unaided, before any feedback;
+    it is returned whether or not it passed, so that the same jets can be
+    judged before and after refinement and the two compared pairwise. The keys
+    are the same under both, which is what pairs them.
 
     Scoring what the pipeline would actually deliver means taking only the
     narratives that passed verification; `accepted_only=False` also returns the
@@ -147,11 +265,15 @@ def load_from_runs(runs: Path, block: str, models: List[str], accepted_only: boo
             r = json.loads(line)
             if r["status"] == "abstained" or not r["attempts"]:
                 continue
-            att = r["attempts"][0]
-            if "completion" not in att:
+            # final: under the retry loop the last attempt, which is the one that
+            # passed when any did; with one attempt it is the only one, so the
+            # published v16 selection is unchanged. first: attempt 0.
+            att = pick_attempt(r, which)
+            if att is None:
                 continue
-            passes = verify(att["completion"]["text"], r["artefact"], glossary=glossary).ok
-            if accepted_only and not passes:
+            passes = verify(att["completion"]["text"], r["artefact"], glossary=glossary,
+                            banned_terms=banned_terms).ok
+            if accepted_only and which == "final" and not passes:
                 continue
             text = re.sub(r"[ \t]{2,}", " ",
                           re.sub(r"\[/?[A-Za-z][A-Za-z0-9_]*\]", "", att["completion"]["text"])).strip()
@@ -159,6 +281,8 @@ def load_from_runs(runs: Path, block: str, models: List[str], accepted_only: boo
                 "text": text, "model": m, "jet_id": r["jet_id"],
                 "status": "ok" if passes else "failed_verification",
                 "status_recorded": r["status"], "regime": r["regime"],
+                "view": which, "attempt": att["attempt"], "n_attempts": len(r["attempts"]),
+                "delivered": r["status"] == "ok",
                 "decision": r["artefact"]["decision"],
             }
     return out
@@ -180,7 +304,9 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--set", type=Path, default=repo / "evaluation/annotation_set")
     p.add_argument("--items", default="items", help="Subdirectory of --set to score")
-    p.add_argument("--judges", nargs="+", default=list(JUDGES), choices=list(JUDGES))
+    # GLM 5.3 and Muse Spark 1.3 by default (2026-11-16); Sonnet and Mistral only to read or
+    # resume the earlier runs.
+    p.add_argument("--judges", nargs="+", default=DEFAULT_JUDGES, choices=list(JUDGES))
     p.add_argument("--only", nargs="+", default=None, help="Score just these ids, e.g. N01 N02")
     p.add_argument("--repeat", type=int, default=1, help="Score each item this many times")
     p.add_argument("--max-tokens", type=int, default=2000)
@@ -188,20 +314,42 @@ def main() -> None:
     p.add_argument("--out", type=Path, default=None)
     p.add_argument("--from-runs", metavar="BLOCK", default=None,
                    help="Score a sweep block directly, e.g. v16, instead of an item directory")
+    p.add_argument("--models", nargs="+", default=None,
+                   help="With --from-runs, the run names to score (default: `generators` "
+                        "in the narrative config)")
+    p.add_argument("--attempt", choices=["first", "final"], default="final",
+                   help="With --from-runs: final, the delivered narratives (default); first, "
+                        "every jet's unaided first attempt, passed or not, for a paired "
+                        "before/after-refinement comparison")
     p.add_argument("--include-rejected", action="store_true",
                    help="With --from-runs, also score narratives that failed verification")
+    p.add_argument("--config", type=Path, default=repo / "narrative/configs/narrative_top.yaml",
+                   help="With --from-runs, the narrative config of the use case "
+                        "(narrative_anomaly.yaml for anomaly detection)")
+    p.add_argument("--jets", type=int, nargs="+", default=None,
+                   help="With --from-runs, score only these jet ids (every model's narrative of each)")
     args = p.parse_args()
 
     prompt = yaml.safe_load(args.prompt.read_text())
+    # judge-v2 has no `dimensions` field: its three are the module default.
+    dims = tuple(prompt.get("dimensions") or DIMENSIONS)
     meta: Dict[str, dict] = {}
     if args.from_runs:
-        repo_cfg = yaml.safe_load((repo / "narrative/configs/narrative_top.yaml").read_text())
+        repo_cfg = yaml.safe_load(args.config.read_text())
         runs = repo / repo_cfg["outputs"]["narratives"]
-        gens = ["gemini-3.5-flash", "deepseek-v4-flash", "gemini-3.5-flash-lite", "gpt-oss-120b"]
+        gens = args.models or [g["name"] for g in repo_cfg["generators"]]
         glossary = load_glossary(repo / repo_cfg["glossary"]["path"], require_reviewed=True)
-        meta = load_from_runs(runs, args.from_runs, gens, not args.include_rejected, glossary)
+        banned = tuple((repo_cfg.get("verifier") or {}).get("banned_terms") or ())
+        meta = load_from_runs(runs, args.from_runs, gens, not args.include_rejected, glossary,
+                              which=args.attempt, banned_terms=banned)
+        if args.jets:
+            keep = set(args.jets)
+            meta = {k: v for k, v in meta.items() if v["jet_id"] in keep}
         items = {k: v["text"] for k, v in meta.items()}
-        kind = "all narrated" if args.include_rejected else "accepted only"
+        if args.attempt == "first":
+            kind = "first attempts, passed or not"
+        else:
+            kind = "all narrated" if args.include_rejected else "delivered only"
         print(f"block {args.from_runs}: {len(items)} narratives ({kind})")
     else:
         items = load_items(args.set / args.items)
@@ -210,7 +358,7 @@ def main() -> None:
     if missing:
         sys.exit(f"unknown ids: {' '.join(missing)}")
 
-    tag = f"_{args.from_runs}" if args.from_runs else ""
+    tag = f"_{args.from_runs}_{args.attempt}" if args.from_runs else ""
     out_path = args.out or (repo / f"evaluation/results/judgments{tag}_{prompt['id']}.jsonl")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -224,7 +372,9 @@ def main() -> None:
                 r = json.loads(line)
             except json.JSONDecodeError:      # a line torn in half by a kill
                 continue
-            if "verdict" in r:
+            # A verdict from another prompt version was given by a different
+            # instrument, so it does not count as done for this one.
+            if "verdict" in r and r.get("prompt_id") == prompt["id"]:
                 done.add((r["id"], r["judge"], r.get("rep", 0)))
     todo = sum(1 for n in ids for j in args.judges for k in range(args.repeat)
                if (n, j, k) not in done)
@@ -244,8 +394,8 @@ def main() -> None:
                     try:
                         raw = judge_one(items[nid], judge, prompt, args.max_tokens)
                         rec.update(raw)
-                        rec["verdict"] = parse_verdict(raw["text"])
-                        scores = " ".join(f"{d[:4]}={rec['verdict'][d]['score']}" for d in DIMENSIONS)
+                        rec["verdict"] = parse_verdict(raw["text"], dims)
+                        scores = " ".join(f"{d[:4]}={rec['verdict'][d]['score']}" for d in dims)
                         print(f"  {nid} {judge:<16} rep{rep}  {scores}  ({raw['seconds']}s)")
                     except Exception as exc:
                         n_bad += 1

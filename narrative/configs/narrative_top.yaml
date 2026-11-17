@@ -23,12 +23,21 @@ artefact:
     # 0.0, which reads as "no jet lies further out" and is false.
     pct: 2
 
-# Abstention gate, calibrated on the test set (see narrative/README.md).
-# |r| = |t_clip - g_hat|, the part of the decision the basis does not express.
+# Abstention gate on decisions and ranks (narrative/gate_top.py, 2026-11-13),
+# the same scheme as anomaly/gate.py: abstain when the surrogate takes the
+# other decision, caveat when it agrees but ranks the jet more than X
+# percentile points away from the tagger, X calibrated on val
+# (`python -m narrative.gate_top`). Independent of the teacher's logit scale.
+#
+# Up to v17 the gate was |t_clip - g_hat| < 1.0 full, < 2.0 caveat, else
+# abstain, in logit units. Its thresholds came from an earlier teacher; on the
+# seed-42 teacher they gave 50% full, 29% caveat, 21% abstain on test (v17:
+# 58 / 25 / 17). Remove `gate` to fall back to them.
 abstention:
-  full_threshold: 1.0      # |r| < 1.0  -> narrate normally      (69.5% coverage)
-  caveat_threshold: 2.0    # 1.0 <= |r| < 2.0 -> narrate with adequacy caveat
-                           # |r| >= 2.0 -> abstain, no narrative (7.1% of jets)
+  gate: narrative/outputs/top/gate
+  reference: surrogate/outputs/top/features/features_val.parquet
+  full_threshold: 1.0
+  caveat_threshold: 2.0
 
 glossary:
   path: narrative/configs/glossary_top.yaml
@@ -46,7 +55,7 @@ llm:
   #   vertex     google-genai, ADC               gcloud application-default login
   #   deepseek   OpenAI-compatible               DEEPSEEK_API_KEY
   #   groq       OpenAI-compatible               GROQ_API_KEY
-  #   ollama     OpenAI-compatible               OLLAMA_API_KEY
+  #   vllm       OpenAI-compatible, served by us  none (VLLM_BASE_URL, default localhost:8000)
   #
   # `backend` and `model` are both overridable from the command line
   # (--backend, --model), which is how a sweep runs several providers against
@@ -58,35 +67,75 @@ llm:
   project: null
   # "global", not a region: the Gemini 3.x models are served only from the
   # global endpoint and return 404 from every regional one (tested us-central1,
-  # us-east5, europe-west4). The 2.5 family works from both, so global is the
-  # one endpoint that reaches everything.
+  # europe-west4). The 2.5 family is retired and returns 404 everywhere.
   location: global
-  # Cheapest tier this project can actually reach: the 3.x models are listed
-  # under us-central1 but generateContent returns 404 for them here.
-  # Callable and verified: gemini-2.5-flash-lite, -flash, -pro.
+  # The default for a single run; a sweep takes its models from `generators`
+  # below, each with --backend/--model. gemini-3.5-flash-lite is the cheapest.
   # The verifier retries on failure, so a weak model trades cost against
   # attempts: measure the pass rate before settling on this.
-  model: gemini-2.5-flash-lite
+  model: gemini-3.5-flash-lite
   temperature: 0.0
   seed: 42
   # Thinking tokens are drawn from this same budget, so it has to cover both.
-  # Measured: a complete narrative runs ~1700-2000 output tokens, and
-  # gemini-2.5-flash spends ~3900 more on reasoning. At 2048 the reasoning
-  # models returned truncated narratives that failed verification for lack of
-  # room rather than for lack of ability.
+  # Measured: a complete narrative runs ~1700-2000 output tokens. At 2048 the
+  # reasoning models returned truncated narratives that failed verification for
+  # lack of room rather than for lack of ability, so leave headroom for thinking.
   max_output_tokens: 8192
   # 0 disables reasoning; null leaves the model's default in place.
-  # gemini-2.5-flash-lite does not reason at all, gemini-2.5-flash obeys, and
-  # gemini-2.5-pro rejects the field outright — the client records which of the
-  # three actually happened for every call.
+  # gemini-3.5-flash-lite does not reason by default; gemini-3.5-flash reasons
+  # by default and obeys 0. The client records what actually happened for every
+  # call, and falls back to no thinking_config if a model rejects the field.
   thinking_budget: 0
-  max_attempts: 1
-  # Retries raise the temperature by this much per attempt. Advancing only the
+  # The PONTE loop (hercolelab/personalized_xai): up to five attempts, each
+  # retry a rewrite of the rejected narrative by the same model, from the
+  # verifier's failures and their history, at temperature 0.2 as PONTE's
+  # refiner. Nothing is delivered if no attempt passes. The published v16 ran
+  # max_attempts 1; its first-attempt rates are still read off attempt 0.
+  max_attempts: 5
+  retry_mode: refine
+  refine_temperature: 0.2
+  # retry_mode: resample only. Retries raise the temperature by this much per attempt. Advancing only the
   # seed is not enough: measured on the first run, 4 seeds at temperature 0
   # returned byte-identical text on 2 jets out of 5, so the loop re-failed
   # identically. The SDK only promises "best effort" determinism from a seed,
   # and here it delivers rather more than that.
   retry_temperature_step: 0.3
+
+# The generators a sweep runs, in one place. `name` is the file suffix a run is
+# written under (<block>_<name>.jsonl) and the key every report reads it back
+# by; blocks_report and `judge.py --from-runs` take this list as their default.
+# Chosen 2026-11-06 on a six-jet pilot against the current catalogue:
+#   gemini-3.5-flash        5/6 verified; the Flash of the published v16, kept so
+#                           that model is compared like for like. In the pilot
+#                           3.6/3.7-flash were 6/6, 3.8 slow (~56 s), 4-argon
+#                           rejects thinking_budget, 3.1-pro still preview; v17
+#                           was first run with 3.7-flash (TOTAL 0.98 first try,
+#                           1.00 delivered), its file left beside the others
+#   gemini-3.5-flash-lite   3/6; no newer flash-lite exists, kept as the weak end
+#   deepseek-flash          6/6; DeepSeek's own name, served by V4.1-Flash-1017.
+#                           deepseek-v4-flash is a retired alias of the same model
+#   gpt-oss-120b            0/6 on format; the open-weights reference, at the
+#                           lowest effort it accepts (it cannot switch reasoning off).
+#                           v17 ran it on Ollama Cloud, which no longer serves it
+#                           free (2026-11-10); now served by us with vLLM on
+#                           Leonardo, so v17 has to be regenerated for it (the
+#                           Ollama file is not comparable: other kernels/quantisation)
+# The published v16 results used gemini-3.5-flash and deepseek-v4-flash (V4 Flash,
+# no longer served); pass --models to the reports to read those files.
+generators:
+  - {name: gemini-3.5-flash,      backend: vertex,   model: gemini-3.5-flash}
+  - {name: gemini-3.5-flash-lite, backend: vertex,   model: gemini-3.5-flash-lite}
+  - {name: deepseek-flash,        backend: deepseek, model: deepseek-flash}
+  - {name: gpt-oss-120b,          backend: vllm,     model: gpt-oss-120b, reasoning_effort: low}
+  # Qwen, served by us with vLLM (TODO.md): to be validated with the debug test
+  # before their results count. Thinking switched off per request, so they are
+  # compared without reasoning like the Gemini and DeepSeek runs.
+  - {name: qwen3.8-27b,           backend: vllm,     model: qwen3.8-27b,
+     extra_body: {chat_template_kwargs: {enable_thinking: false}}}
+  # Qwen3.8-Flash-Next was tried and dropped (2026-11-11): it needs a whole
+  # node and its test sat in the queue for hours; the 27B is enough.
+# The `vllm` generators run only inside scripts/slurm/vllm_generate.sbatch (the
+# server is on the GPU node); scripts/run_generators.sh on the login node skips them.
 
 outputs:
   stats: narrative/outputs/top/reference_stats

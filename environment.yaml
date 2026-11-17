@@ -23,6 +23,10 @@ dependencies:
   - xgboost=3.2
   - cppyy=2.3
   - fastjet=3.5
+  # The C++ headers cppyy compiles against. conda-forge now ships them apart
+  # from fastjet-cxx, which carries only the shared libraries; without this the
+  # observables fail on `fastjet/PseudoJet.hh` not found.
+  - fastjet-cxx-devel=3.5
   - fastjet-contrib=1.103
   - joblib
   - tqdm
@@ -31,6 +35,6 @@ dependencies:
       # The EBM. Not on conda-forge at a usable version.
       - interpret==0.7.8
       # Narrator and judge backends. The OpenAI-compatible providers
-      # (DeepSeek, Groq, Ollama) are reached over plain urllib, no SDK.
+      # (DeepSeek, Groq, our vLLM server) are reached over plain urllib, no SDK.
       - google-genai==2.17.0
       - anthropic==1.2.0

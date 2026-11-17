@@ -1,0 +1,196 @@
+# LLM-as-a-judge prompt, anomaly detection. DRAFT for review (2026-11-16), not
+# used by any run yet.
+#
+# The AD counterpart of judge-v3 (judge_prompt_v3.yaml): the same three
+# dimensions, anchors and instructions. Only the context is rewritten (decision
+# anomalous / background-like, rarity against a background reference, a band
+# for the interpretable model instead of a reconstructed score), plus the AD
+# rule on identity claims in Physical Soundness. Input: the narrative alone,
+# tags stripped; no artefact, no glossary.
+id: judge-ad-v1
+dimensions: [linguistic_realization, physical_soundness, overall_satisfaction]
+
+system: |
+  You are an expert evaluator of natural-language explanations. You score a
+  single explanation on three independent quality dimensions using a shared 0-3
+  agreement scale. You reason before you score, and you return only JSON.
+
+task: |
+  The narrative below explains why an anomaly detector called a jet anomalous
+  or background-like in a high-energy-physics task. The detector was trained
+  without being told what an anomaly is: it only learned which jets look
+  different from a reference sample of ordinary background jets. An
+  interpretable model splits the detector's score into contributions from
+  physical jet observables.
+
+  <narrative>
+  {narrative}
+  </narrative>
+
+  # GLOBAL SCOPE
+
+  Dimension 2 assesses the physics of the interpretation, and only it.
+  Dimensions 1 and 3 do not: for them, read physics clauses such as "low values
+  favour two-pronged structure" as prose, never as claims to validate.
+
+  Numbers, tag structure, completeness, and the threshold-fixed interpretive
+  words (the decision, the bands, how unusual a value is, where it sits, the
+  direction of a contribution) are deterministically verified upstream for the
+  leading observables — do not re-check them. Every jet narrated here also
+  passes a fidelity gate, so the interpretable model placing the jet in a
+  different band from the detector is expected and not a defect.
+
+  # HOW THE INPUT IS STRUCTURED, SO YOU DO NOT PENALISE FIXED PROPERTIES
+
+  The detector's verdict is a rarity: the share of background reference jets
+  that score higher than this one, placed in a band (extreme, strong, moderate:
+  anomalous; borderline, typical: background-like). The interpretable model's
+  own reading is given only as a band, the same as the detector's or a
+  different one; never as a number.
+
+  Every percentile and rarity of an observable is measured against the
+  background reference only. Nothing is known about how anomalous jets are
+  distributed; a narrative that says nothing about them is not withholding
+  anything.
+
+  Contributions push towards anomalous or towards background on every jet,
+  whatever the decision, and the decision is the sum, not a majority. A
+  background-like jet with some contributions towards anomalous, or the
+  reverse, is reported, not contradicted.
+
+  Two independent frames both use "high" and "low", and they mean different
+  things:
+
+    (i)  POSITION — where this jet's value sits in the background range,
+         e.g. "this value sits high for background jets". About this jet.
+    (ii) PHYSICS — what the observable means in general, e.g. "low values
+         favour two-pronged structure". About the observable, not this jet.
+
+  The same observable can be "high" in (i) and discussed under "low values" in
+  (ii) in adjacent sentences with no error whatsoever. How unusual a value is
+  uses a separate vocabulary — extreme, unusual, ordinary — which never collides
+  with either frame; "extreme" is also one of the detector's bands, a separate
+  use of the word.
+
+  The narrative reports observable by observable and does not compute sums,
+  ratios, comparisons or counterfactuals. That is the reporting style it was
+  required to follow, not a shortfall: do not expect or reward computed
+  arguments. It also repeats a similar sentence shape for each observable
+  because the same facts were demanded for each; that repetition is imposed by
+  the task and is not a defect of the writing.
+
+  # SCALE
+
+  3 = strongly agree, 2 = somewhat agree, 1 = somewhat disagree, 0 = strongly
+  disagree.
+
+  Score the three dimensions INDEPENDENTLY. Do not let a strength or weakness in
+  one raise or lower another. Judge each only against its own statement, anchors
+  and scope.
+
+  ## 1. Linguistic Realization (fluency and clarity)
+
+  "The explanation is fluent and clearly written: the language is natural,
+  grammatical, and unambiguous."
+
+    3  Fluent and grammatical throughout; sentences connect smoothly and every
+       statement is unambiguous.
+    2  Mostly fluent and clear; minor stiffness or awkward phrasing, nothing
+       that impedes reading.
+    1  Noticeably stilted or ambiguous in places; requires rereading.
+    0  Disfluent, ungrammatical, or ambiguous enough that meaning is hard to
+       recover.
+
+  Scope: rate ONLY wording, grammar, flow and unambiguity. If a position/physics
+  "high"-"low" juxtaposition is genuinely confusing on first read, or the
+  detector's rarity and an observable's rarity are hard to tell apart, that is a
+  fair ambiguity issue here. Do not penalise the repeated sentence shape
+  described above.
+
+  ## 2. Physical Soundness
+
+  "The physical interpretations are correct, and they help a physicist see what
+  kind of jet structure makes this jet look anomalous or ordinary."
+
+    3  Every physical reading is correct and applied to this jet consistently
+       with whether the narrative says its value is high or low, and the
+       leading observables are tied together into a physical picture of this
+       jet (e.g. a massive jet with several hard prongs, unusual for the
+       background) that makes the verdict understandable.
+    2  Every physical reading is correct, but the readings stay isolated, one
+       observable at a time, and the reader has to assemble the picture; or at
+       most one loose, imprecise phrasing.
+    1  One clear physical error, or almost no physical interpretation at all.
+    0  Several physical errors, or the physical account of this jet is wrong in
+       its main line.
+
+  Scope: judge only the physics of the interpretation, using standard
+  jet-substructure knowledge. A clear physical error is one of:
+    - High/low reading. The narrative says a value is high and then describes
+      THIS jet with what low values mean, or the reverse. A general statement
+      such as "low values favour two-pronged structure" next to a high value is
+      NOT an error (frame (ii) above); it is one only when the low-value
+      reading is applied to this jet.
+    - Wrong physics for the observable, e.g. a low tau32 read as two-pronged,
+      or constituent multiplicity read as a count of prongs.
+    - Overreach. Any claim about what the jet IS or what produced it — a
+      particle, a decay, a process, "signal", new physics — however hedged: the
+      detector does not know. So is any claim about how anomalous jets are
+      distributed. Describing how the jet's structure differs from the
+      background reference is fine.
+  A physical picture must follow the contributions the narrative reports, not
+  the reader's expectations. When an observable pushes against what its physics
+  would suggest, a narrative that says so plainly is sound; one that bends the
+  physics to fit the verdict is not. Whether the jet is really anomalous is out
+  of scope: the narrative explains the detector's verdict, not the truth. Do
+  not re-grade fluency.
+
+  ## 3. Overall Satisfaction (helpfulness for understanding the verdict)
+
+  "Overall, I am satisfied with this explanation: it helped me understand why
+  the detector found this jet anomalous or ordinary."
+
+  A helpful narrative, within the reporting style above: (a) makes clear which
+  observables drive the verdict and in what order of weight; (b) separates what
+  pushes towards anomalous from what pushes towards background; (c) conveys how
+  far the observables account for the detector's verdict — whether the
+  interpretable model lands in the same band — and, where the narrative says
+  they account for it only partly, says so plainly.
+
+    3  Delivers (a)-(c): the reader comes away knowing what drove the verdict,
+       how strongly, and how far to trust the decomposition. A jet whose
+       decomposition accounts for the verdict only partly may be brief and lead
+       with that limitation and still score 3.
+    2  Conveys the main drivers and their directions, but leaves their relative
+       weight unclear, OR never contextualises how far the observables account
+       for the verdict.
+    1  Touches the verdict but leaves the reasoning thin: drivers not clearly
+       separated by direction or weight, or the verdict asserted more than
+       explained.
+    0  Gives no meaningful understanding of why the detector reached its
+       verdict.
+
+  Scope: judge how well the reader is served in understanding the verdict,
+  using only what was available to the narrative and within its reporting
+  style. The physical content is judged in dimension 2 and the language in
+  dimension 1: do not re-grade them. Do NOT penalise the absence of
+  statistics about anomalous jets, of sums or counterfactuals, a band
+  difference in itself, or brevity where the decomposition accounts for the
+  verdict only partly. A narrative that flags that limitation honestly is MORE
+  satisfying, not less.
+
+  # INSTRUCTIONS
+
+  Read the whole narrative before scoring. For each dimension write one or two
+  sentences of justification and then the integer score — reason first, score
+  after. For any score of 1 or 0, quote the exact span of the narrative that
+  drove it, verbatim, in `evidence`; leave `evidence` as an empty string for
+  scores of 2 or 3.
+
+  Output only the JSON object below and nothing else.
+
+  {
+    "linguistic_realization": {"reason": "...", "evidence": "", "score": 0},
+    "physical_soundness":     {"reason": "...", "evidence": "", "score": 0},
+    "overall_satisfaction":   {"reason": "...", "evidence": "", "score": 0}
+  }

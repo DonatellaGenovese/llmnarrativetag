@@ -1,0 +1,132 @@
+# Observable glossary for the anomaly-detection narrative prompt.
+#
+# Same observables and definitions as narrative/configs/glossary_top.yaml.
+# The `meaning` of each entry is the ONLY licence the narrator has to interpret
+# a value, so here it must describe the jet's structure without naming what
+# produced it: the IAD detector is trained without labels and does not know
+# that the injected signal is top jets, and the verifier rejects any narrative
+# that names a particle, a process or a signal (verifier.banned_terms in
+# narrative_anomaly.yaml). A glossary that used those words would teach the
+# narrator to write them.
+#
+# Four meanings were rewritten from the top-tagging glossary for this reason
+# (m, tau32, D2_double_b1, pT); the other six are unchanged. All ten were
+# reviewed for this use on 2026-11-11.
+#
+# With `glossary.require_reviewed: true` the pipeline refuses to build a prompt
+# while any entry is still `status: draft`.
+
+observables:
+  m:
+    label: jet mass
+    units: GeV
+    definition: Ungroomed jet mass.
+    # Top tagging: "...a hadronically decaying top quark deposits its decay
+    # products in one jet, so the mass concentrates near the top mass..."
+    meaning: >-
+      The invariant mass of the whole jet. Jets initiated by a single parton
+      acquire mass only from radiation in the shower and typically sit low; a
+      high mass indicates several hard, well-separated energy deposits within
+      the jet.
+    status: reviewed
+
+  m_SD:
+    label: soft-drop mass
+    units: GeV
+    definition: Soft-drop mass (z_cut = 0.1, beta = 0, R0 = 0.8).
+    meaning: >-
+      The jet mass after soft radiation has been groomed away; with beta = 0 the
+      z_cut condition is angle-independent, so soft emissions are removed at all
+      angles and only the hard core survives. Less sensitive to pile-up and
+      underlying event than the ungroomed mass.
+    status: reviewed
+
+  tau21:
+    label: N-subjettiness ratio tau2/tau1
+    units: null
+    definition: N-subjettiness ratio tau2/tau1 (beta = 1, one-pass kT axes).
+    meaning: >-
+      The residual left by describing the radiation with two axes, relative to
+      one. Low values indicate a genuinely two-pronged jet; values near one mean
+      the second axis buys nothing.
+    status: reviewed
+
+  tau32:
+    label: N-subjettiness ratio tau3/tau2
+    units: null
+    definition: N-subjettiness ratio tau3/tau2 (beta = 1, one-pass kT axes).
+    # Top tagging: "...the configuration expected from a top decaying to three
+    # quarks..."
+    meaning: >-
+      The residual left by three axes relative to two. Low values indicate three
+      resolved prongs, but the ratio is only meaningful once the jet has
+      appreciable mass.
+    status: reviewed
+
+  C2_double_b1:
+    label: energy correlation ratio C2
+    units: null
+    definition: Energy correlation ratio C2 (beta = 1).
+    meaning: >-
+      A double ratio of energy correlation functions, e3*e1/e2^2, using up to the
+      three-point correlator; the subscript counts prongs, so low values favour
+      two-pronged structure. Strongly correlated with jet mass and pT, so it must
+      not be read independently of them.
+    status: reviewed
+
+  D2_double_b1:
+    label: energy correlation ratio D2
+    units: null
+    definition: Energy correlation ratio D2 (beta = 1).
+    # Top tagging: "...so it is not the natural discriminant for a
+    # three-pronged top decay."
+    meaning: >-
+      e3*e1^3/e2^3, built by power counting to separate two-pronged from
+      one-pronged jets with the mass correlation of C2 largely removed. Low
+      values favour two prongs specifically, not multi-pronged structure in
+      general.
+    status: reviewed
+
+  C3_double_b1:
+    label: energy correlation ratio C3
+    units: null
+    definition: Energy correlation ratio C3 (beta = 1, truncated at 50 constituents).
+    meaning: >-
+      The three-prong analogue of C2, e4*e2/e3^2, built from correlators up to
+      four points, with low values favouring a third resolved energy centre.
+      Computed on at most 50 constituents, so high-multiplicity jets are
+      systematically biased.
+    status: reviewed
+
+  N3_b1:
+    label: generalized correlator N3
+    units: null
+    definition: Generalized correlator N3 (beta = 1, truncated at 40 constituents).
+    meaning: >-
+      A ratio of generalized energy correlators, which retain only a subset of
+      the pairwise angles and so give better power counting in the three-prong
+      region and less mass correlation than C3. Low values favour three-pronged
+      structure; computed on at most 40 constituents, so high-multiplicity jets
+      are systematically biased.
+    status: reviewed
+
+  pT:
+    label: jet transverse momentum
+    units: GeV
+    definition: Jet transverse momentum.
+    # Top tagging: "...fixes how collimated the decay products of a heavy
+    # particle would be."
+    meaning: >-
+      The momentum of the jet transverse to the beam. It sets the scale of the
+      jet rather than its substructure, and how collimated its hard energy
+      deposits are.
+    status: reviewed
+
+  n_const:
+    label: constituent multiplicity
+    units: null
+    definition: Constituent multiplicity.
+    meaning: >-
+      How many particles the jet contains. Multiplicity grows with the amount of
+      radiation in the shower and with the number of hard partons initiating it.
+    status: reviewed

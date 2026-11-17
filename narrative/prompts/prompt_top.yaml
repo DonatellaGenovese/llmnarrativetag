@@ -1,7 +1,10 @@
 # Narrator prompt — TopLandscape. Versioned: the id is recorded with every
 # narrative, so Part 4 numbers stay attributable to the prompt that produced
 # them. Bump it on any edit to `system`, `task` or `caveat`.
-id: top-v16
+#
+# top-v17 (2026-11-13): band-edge rule reworded ("takes the word above it"
+# could be read as the higher band). Nothing else changed; v17 ran top-v16.
+id: top-v17
 
 system: |
   You are an expert XAI (Explainable AI) Interpreter and Data Narrator. Your
@@ -106,8 +109,9 @@ task: |
   applied to a number you were given, not by a judgement of your own, and must
   be written lower case with no synonym and no qualifier.
 
-  Each threshold below is inclusive of its upper edge, so a value sitting
-  exactly on a boundary takes the word above it.
+  Each band below includes its upper edge: a value exactly on an edge belongs
+  to the band that ends there (a `rarity` of exactly 2 is extreme, a `pct` of
+  exactly 25 is low).
 
   [Q<i>] from `rarity`              [S<i>] from `pct`
       2 or less         -> extreme      25 or less         -> low
@@ -217,6 +221,43 @@ remainder: |
 
     [N]number[/N]              n_other
     [O]number[/O]              phi_other
+
+# Refinement, after a narrative fails verification: the PONTE loop
+# (hercolelab/personalized_xai, f_refiner.py). The same model receives its own
+# failed narrative, the verifier's failures on it, and the history of failures
+# across this jet's attempts, and rewrites the whole narrative. `{task}` is the
+# generation prompt exactly as it was sent, so the rules, the glossary and the
+# artefact are the ones the narrative is checked against. Versioned on its own:
+# `id` above covers generation, which this does not change.
+refine_id: top-refine-v1
+refine: |
+  {task}
+
+  # PREVIOUS NARRATIVE (REJECTED)
+
+  You wrote the narrative below for the artefact above. It was checked against
+  the artefact and rejected.
+
+  ---
+  {narrative}
+  ---
+
+  # FAILURES OF THE PREVIOUS NARRATIVE
+
+  {failures}
+
+  # FEEDBACK HISTORY (ALL ATTEMPTS ON THIS JET)
+
+  {feedback_history}
+
+  # YOUR TASK
+
+  Rewrite the narrative so that every failure above is fixed and no earlier one
+  comes back. Follow every rule of the original instructions: every number from
+  the artefact inside its tag, every tagged word the one the rule gives, every
+  required tag present, no digits outside a tag. Keep what was correct. Output
+  only the complete corrected narrative, with no preamble and no comment on the
+  changes.
 
 # Appended to `task` when the abstention gate puts the jet in the caveat
 # regime: the decomposition tracks the tagger loosely enough that the

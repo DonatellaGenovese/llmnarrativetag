@@ -2,6 +2,10 @@
 
 Official protocol: fit on train, select on val, report on test.
 Clip thresholds and Ridge ratio percentiles are fit on train only.
+
+The target defaults to `t`. `--scores DIR --target score` fits the same three
+models to an external per-jet score instead, such as an anomaly detector's
+logit from anomaly.transfer, joined onto the feature tables on jet_id.
 """
 
 from __future__ import annotations
@@ -142,6 +146,44 @@ def _eval_split(y: np.ndarray, yp: np.ndarray) -> Dict[str, float]:
     }
 
 
+def _split_name(features_path: Path) -> str:
+    """`features_val.parquet` -> `val`: which scores file goes with which table."""
+    stem = features_path.stem
+    if not stem.startswith("features_"):
+        raise SystemExit(f"cannot tell the split of {features_path}; expected features_<split>.parquet")
+    return stem[len("features_"):]
+
+
+def join_scores(df: pd.DataFrame, scores_path: Path, allow_in_sample: bool) -> pd.DataFrame:
+    """Attach an external per-jet score to the feature table, one-to-one on jet_id.
+
+    Every jet of the table must have exactly one score and the labels must
+    agree, or the two files do not describe the same jets and the fit would be
+    silently wrong. Scores the producing model was trained on (`in_fit`) are
+    refused unless asked for: a surrogate fit to them imitates in-sample
+    behaviour, not the model as it is applied.
+    """
+    sc = pd.read_parquet(scores_path)
+    if sc["jet_id"].duplicated().any():
+        raise SystemExit(f"{scores_path}: duplicated jet_id")
+    out = df.merge(sc.drop(columns=["label"]), on="jet_id", how="left", validate="one_to_one")
+    if out["score"].isna().any():
+        raise SystemExit(f"{scores_path}: {int(out['score'].isna().sum())} jets of the table have no score")
+    lab = df[["jet_id", "label"]].merge(sc[["jet_id", "label"]], on="jet_id", suffixes=("", "_sc"))
+    if not (lab["label"] == lab["label_sc"]).all():
+        raise SystemExit(f"{scores_path}: labels disagree with the feature table")
+    if "in_fit" in out and out["in_fit"].any():
+        n = int(out["in_fit"].sum())
+        if not allow_in_sample:
+            raise SystemExit(
+                f"{scores_path}: {n:,} of {len(out):,} jets were in the training set of the model "
+                "that produced this score. Fit the surrogate on a split that model never saw "
+                "(e.g. --train features_val.parquet), or pass --allow-in-sample."
+            )
+        print(f"warning: {n:,} in-sample scores kept in {scores_path.name}")
+    return out
+
+
 def train_all(
     train_parquet: Path,
     val_parquet: Path,
@@ -149,7 +191,18 @@ def train_all(
     config_path: Path,
     out_dir: Path,
     max_jets: int | None = None,
+    target: str = "t",
+    scores_dir: Path | None = None,
+    allow_in_sample: bool = False,
 ) -> None:
+    """Fit the three surrogates to `target`.
+
+    By default the target is `t`, ParT's logit difference, already a column of
+    the feature table. With `scores_dir`, it comes instead from
+    <scores_dir>/scores_<split>.parquet (jet_id, label, score), joined onto each
+    table on jet_id, and `target` names a column of that file — normally
+    `score`. This is how the same surrogate is fit to an anomaly score.
+    """
     cfg = _load_yaml(config_path)
     obs: List[str] = list(cfg["observables"])
     fit = cfg["fit"]
@@ -157,17 +210,25 @@ def train_all(
 
     def _load(path: Path) -> pd.DataFrame:
         df = pd.read_parquet(path)
+        if scores_dir is not None:
+            df = join_scores(df, scores_dir / f"scores_{_split_name(path)}.parquet", allow_in_sample)
         if max_jets is not None:
             df = df.iloc[:max_jets].copy()
+        if target not in df:
+            raise SystemExit(f"target column {target!r} not in {path}"
+                             + (f" joined with {scores_dir}" if scores_dir else ""))
         return df
 
     df_tr = _load(train_parquet)
     df_va = _load(val_parquet)
     df_te = _load(test_parquet)
+    print(f"target: {target}" + (f" from {scores_dir}" if scores_dir else " (feature table)")
+          + f"  | fit {train_parquet.name} {len(df_tr):,} · val {val_parquet.name} {len(df_va):,}"
+          f" · test {test_parquet.name} {len(df_te):,}")
 
-    y_tr = df_tr["t"].to_numpy(dtype=np.float64)
-    y_va = df_va["t"].to_numpy(dtype=np.float64)
-    y_te = df_te["t"].to_numpy(dtype=np.float64)
+    y_tr = df_tr[target].to_numpy(dtype=np.float64)
+    y_va = df_va[target].to_numpy(dtype=np.float64)
+    y_te = df_te[target].to_numpy(dtype=np.float64)
 
     _, clip_info = clip_target(y_tr, *fit["target_clip_percentiles"])
     lo, hi = clip_info["t_clip_lo"], clip_info["t_clip_hi"]
@@ -240,6 +301,7 @@ def train_all(
 
     y_by = {"train": y_tr_c, "val": y_va_c, "test": y_te_c}
     metrics = {
+        "target": {"column": target, "scores_dir": str(scores_dir) if scores_dir else None},
         "clip": clip_info,
         "n": {"train": int(len(df_tr)), "val": int(len(df_va)), "test": int(len(df_te))},
         "paths": {
@@ -281,8 +343,10 @@ def train_all(
         {"ridge": ridge, "obs": obs, "cfg": fit, "ridge_stats": ridge_stats, "clip": clip_info},
         out_dir / "ridge.joblib",
     )
-    joblib.dump({"ebm": ebm, "obs": obs, "raw_medians": raw_medians, "clip": clip_info}, out_dir / "ebm.joblib")
-    joblib.dump({"gbdt": gbt, "obs": obs, "raw_medians": raw_medians, "clip": clip_info}, out_dir / "gbdt.joblib")
+    joblib.dump({"ebm": ebm, "obs": obs, "raw_medians": raw_medians, "clip": clip_info,
+                 "target": metrics["target"]}, out_dir / "ebm.joblib")
+    joblib.dump({"gbdt": gbt, "obs": obs, "raw_medians": raw_medians, "clip": clip_info,
+                 "target": metrics["target"]}, out_dir / "gbdt.joblib")
 
     te = df_te.copy()
     te["t_clip"] = y_te_c
@@ -313,8 +377,19 @@ def main():
     p.add_argument("--config", type=Path, default=repo / "surrogate/configs/top_basis.yaml")
     p.add_argument("--out-dir", type=Path, default=repo / "surrogate/outputs/top/models")
     p.add_argument("--max-jets", type=int, default=None, help="Cap each split (debug)")
+    p.add_argument("--target", default="t",
+                   help="Column to fit: `t` (ParT, in the feature table) by default; "
+                        "with --scores, a column of the scores files, normally `score`")
+    p.add_argument("--scores", type=Path, default=None,
+                   help="Directory with scores_<split>.parquet (jet_id, label, score), e.g. "
+                        "anomaly/outputs/scores/iad_f0.01_latent; joined on jet_id")
+    p.add_argument("--allow-in-sample", action="store_true",
+                   help="Accept scores flagged in_fit (the scoring model was trained on them)")
     args = p.parse_args()
-    train_all(args.train, args.val, args.test, args.config, args.out_dir, args.max_jets)
+    if args.scores is not None and args.target == "t":
+        args.target = "score"
+    train_all(args.train, args.val, args.test, args.config, args.out_dir, args.max_jets,
+              args.target, args.scores, args.allow_in_sample)
 
 
 if __name__ == "__main__":

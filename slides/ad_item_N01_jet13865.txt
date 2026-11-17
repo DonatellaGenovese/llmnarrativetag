@@ -1,0 +1,155 @@
+ITEM AD-N01  (anomaly detection, jet 13865, generator gemini-3.5-flash, prompt ad-v4,
+              passed all six checks on the first attempt)
+==============================================================================
+
+--- XAI OUTPUT: the payload the LLM receives (artefact), tags on the right ---
+
+{
+  "schema_version": "ad-1",                 
+  "jet_id": 13865,                          no tag
+  "decision": "anomalous",                  [DEC]  (rarity <= 10% -> anomalous)
+  "detector_rarity": 0.21,                  [AR]   % of background scoring higher
+  "detector_band": "strong",                [A]
+  "surrogate_band": "strong",               [AS]   word only, never a number
+  "direction_words": {"positive": "anomalous", "negative": "background"},
+  "features": [
+    {
+      "i": "01",                            
+      "name": "C2_double_b1",               
+      "value": 0.31,                        [V01]
+      "phi": 0.61,                          [I01]  and [D01] = "anomalous"
+      "pct": 98.03,                         no tag -- fixes [S01] = "high"
+      "rarity": 1.97,                       [R01]  and [Q01] = "extreme"
+    },
+    {
+      "i": "02",                            
+      "name": "m",                          
+      "value": 172.4,                       [V02]
+      "phi": 0.53,                          [I02]  and [D02] = "anomalous"
+      "pct": 90.67,                         no tag -- fixes [S02] = "high"
+      "rarity": 9.33,                       [R02]  and [Q02] = "unusual"
+    },
+    {
+      "i": "03",                            
+      "name": "N3_b1",                      
+      "value": 1.62,                        [V03]
+      "phi": -0.19,                         [I03]  and [D03] = "background"
+      "pct": 36.76,                         no tag -- fixes [S03] = "mid"
+      "rarity": 36.76,                      [R03]  and [Q03] = "ordinary"
+    },
+    {
+      "i": "04",                            
+      "name": "m_SD",                       
+      "value": 94.65,                       [V04]
+      "phi": 0.13,                          [I04]  and [D04] = "anomalous"
+      "pct": 75.49,                         no tag -- fixes [S04] = "high"
+      "rarity": 24.51,                      [R04]  and [Q04] = "ordinary"
+    },
+    {
+      "i": "05",                            
+      "name": "n_const",                    
+      "value": 51.0,                        [V05]
+      "phi": 0.13,                          [I05]  and [D05] = "anomalous"
+      "pct": 69.78,                         no tag -- fixes [S05] = "mid"
+      "rarity": 30.22,                      [R05]  and [Q05] = "ordinary"
+    },
+    {
+      "i": "06",                            
+      "name": "C3_double_b1",               
+      "value": 0.28,                        [V06]
+      "phi": -0.07,                         [I06]  and [D06] = "background"
+      "pct": 44.49,                         no tag -- fixes [S06] = "mid" (optional)
+      "rarity": 44.49,                      [R06]  and [Q06] = "ordinary"  ([Q],[S],[D] optional, i > 05)
+    },
+    {
+      "i": "07",                            
+      "name": "tau21",                      
+      "value": 0.64,                        [V07]
+      "phi": -0.05,                         [I07]  and [D07] = "background"
+      "pct": 60.41,                         no tag -- fixes [S07] = "mid" (optional)
+      "rarity": 39.59,                      [R07]  and [Q07] = "ordinary"  ([Q],[S],[D] optional, i > 05)
+    },
+    {
+      "i": "08",                            
+      "name": "tau32",                      
+      "value": 0.56,                        [V08]
+      "phi": 0.03,                          [I08]  and [D08] = "anomalous"
+      "pct": 7.48,                          no tag -- fixes [S08] = "low" (optional)
+      "rarity": 7.48,                       [R08]  and [Q08] = "unusual"  ([Q],[S],[D] optional, i > 05)
+    },
+    {
+      "i": "09",                            
+      "name": "D2_double_b1",               
+      "value": 2.18,                        [V09]
+      "phi": -0.02,                         [I09]  and [D09] = "background"
+      "pct": 32.57,                         no tag -- fixes [S09] = "mid" (optional)
+      "rarity": 32.57,                      [R09]  and [Q09] = "ordinary"  ([Q],[S],[D] optional, i > 05)
+    },
+    {
+      "i": "10",                            
+      "name": "pT",                         
+      "value": 594.82,                      [V10]
+      "phi": 0.0,                           [I10]  and [D10] = "anomalous"
+      "pct": 52.12,                         no tag -- fixes [S10] = "mid" (optional)
+      "rarity": 47.88,                      [R10]  and [Q10] = "ordinary"  ([Q],[S],[D] optional, i > 05)
+    },
+  ]
+}
+
+--- NOT IN THE PAYLOAD (kept out of the LLM's input: no logits, no labels) ---
+  detector score t(j)            2.159
+  surrogate score g_hat(j)       2.185   = intercept 1.104 + sum of phi (additivity error 0.019)
+  detector rarity                0.21 %  -> band strong
+  surrogate rarity               0.61 %  -> band strong (same band: no caveat)
+  working point                  10 % background efficiency; gate regime: full
+  background reference           100751 validation jets (QCD)
+
+--- NARRATIVE (tags kept) ---
+
+The detector has classified this jet as [DEC]anomalous[/DEC], placing its
+score in the [A]strong[/A] anomaly band with a rarity of [AR]0.21[/AR]
+percent. The interpretable surrogate model reconstructs this score within the
+[AS]strong[/AS] band, matching the detector's verdict closely.
+
+The leading contribution comes from the energy correlation ratio C2, which
+pushes in the [D01]anomalous[/D01] direction with a contribution of
+[I01]0.61[/I01]. Its measured value of [V01]0.31[/V01] sits at a
+[S01]high[/S01] level relative to the background reference, which is
+[Q01]extreme[/Q01] for background jets with a rarity of [R01]1.97[/R01]
+percent. Because this value is high, the low-value indication of a two-pronged
+structure does not apply. The second largest contribution is from the
+ungroomed jet mass, which also pushes in the [D02]anomalous[/D02] direction
+with a contribution of [I02]0.53[/I02]. Its value of [V02]172.4[/V02] GeV sits
+[S02]high[/S02] in the background distribution, which is [Q02]unusual[/Q02]
+with a rarity of [R02]9.33[/R02] percent, indicating several hard, well-
+separated energy deposits within the jet. The generalized correlator N3 acts
+in the opposite direction, pushing toward the [D03]background[/D03] with a
+contribution of [I03]-0.19[/I03]. Its value of [V03]1.62[/V03] sits in the
+[S03]mid[/S03] range of the background reference and is [Q03]ordinary[/Q03]
+with a rarity of [R03]36.76[/R03] percent. The soft-drop mass contributes
+[I04]0.13[/I04] in the [D04]anomalous[/D04] direction. Its value of
+[V04]94.65[/V04] GeV, representing the mass of the hard core after soft
+radiation is groomed away, sits [S04]high[/S04] in the background reference
+and is [Q04]ordinary[/Q04] with a rarity of [R04]24.51[/R04] percent. The
+constituent multiplicity also contributes [I05]0.13[/I05] in the
+[D05]anomalous[/D05] direction, measuring how many particles the jet contains.
+Its value of [V05]51.0[/V05] sits in the [S05]mid[/S05] range of the
+background reference and is [Q05]ordinary[/Q05] with a rarity of
+[R05]30.22[/R05] percent.
+
+Among the remaining observables, the energy correlation ratio C3 contributes
+[I06]-0.07[/I06] in the [D06]background[/D06] direction, with a value of
+[V06]0.28[/V06] and a rarity of [R06]44.49[/R06] percent. The N-subjettiness
+ratio tau21 contributes [I07]-0.05[/I07] in the [D07]background[/D07]
+direction, with a value of [V07]0.64[/V07] and a rarity of [R07]39.59[/R07]
+percent. The N-subjettiness ratio tau32 contributes [I08]0.03[/I08] in the
+[D08]anomalous[/D08] direction, with a value of [V08]0.56[/V08] and a rarity
+of [R08]7.48[/R08] percent. The energy correlation ratio D2 contributes
+[I09]-0.02[/I09] in the [D09]background[/D09] direction, with a value of
+[V09]2.18[/V09] and a rarity of [R09]32.57[/R09] percent. Finally, the jet
+transverse momentum contributes [I10]0.0[/I10] in the [D10]anomalous[/D10]
+direction, with a value of [V10]594.82[/V10] GeV and a rarity of
+[R10]47.88[/R10] percent.
+
+--- GENERATION SETTINGS ---
+  temperature 0.0, seed 42; refine loop ad-refine-v1, up to 5 attempts (not needed here)

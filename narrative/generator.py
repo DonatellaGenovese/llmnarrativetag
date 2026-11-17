@@ -68,6 +68,8 @@ class NarrativeGenerator:
         self.template = doc["task"]
         self.caveat = doc.get("caveat", "")
         self.remainder = doc.get("remainder", "")
+        self.refine_id = doc.get("refine_id")
+        self.refine_template = doc.get("refine", "")
         self.glossary = glossary
         self.client = client
 
@@ -94,6 +96,36 @@ class NarrativeGenerator:
         completion = self.client.generate(
             self.system, prompt, seed=seed, temperature=temperature
         )
+        return completion, prompt
+
+    def render_refine(self, artefact: dict, narrative: str, failures: str,
+                      history: str, caveat: bool = False) -> str:
+        """The refinement prompt: the original task, the rejected narrative,
+        its failures and the failure history. replace(), as render() does."""
+        if not self.refine_template:
+            raise ValueError("this prompt file has no `refine` template")
+        text = self.refine_template.replace("{task}", self.render(artefact, caveat=caveat))
+        text = text.replace("{narrative}", narrative.strip())
+        text = text.replace("{failures}", failures)
+        return text.replace("{feedback_history}", history)
+
+    def refine(
+        self,
+        artefact: dict,
+        narrative: str,
+        failures: str,
+        history: str,
+        caveat: bool = False,
+        seed: Optional[int] = None,
+        temperature: Optional[float] = None,
+    ) -> Tuple[Completion, str]:
+        """Rewrite a rejected narrative from its failures, with the same model."""
+        prompt = self.render_refine(artefact, narrative, failures, history, caveat=caveat)
+        completion = self.client.generate(self.system, prompt, seed=seed, temperature=temperature)
+        # PONTE keeps the text after a `NARRATIVE:` marker when the model adds one.
+        text = completion.text
+        if "NARRATIVE:" in text:
+            completion.text = text.split("NARRATIVE:", 1)[1].strip()
         return completion, prompt
 
     def prompt_hash(self, artefact: dict, caveat: bool = False) -> str:

@@ -6,7 +6,13 @@
 # is deliberate and it is the same material the human annotators receive, which
 # is the only condition under which judge-human agreement measures the judge
 # rather than the difference in what the two were shown.
-id: judge-v1
+#
+# v2 (2026-11-06): the output schema written with single braces. v1 showed it as
+# `{{ ... }}`, a leftover from when the template went through str.format; the
+# task is filled with str.replace, so the model saw the doubled braces. Sonnet
+# answered in valid JSON regardless, the GLM and Mistral judges copied them and
+# their replies did not parse. No other change.
+id: judge-v2
 
 system: |
   You are an expert evaluator of natural-language explanations. You score a
@@ -159,8 +165,8 @@ task: |
 
   Output only the JSON object below and nothing else.
 
-  {{
-    "linguistic_realization": {{"reason": "...", "evidence": "", "score": 0}},
-    "internal_consistency":   {{"reason": "...", "evidence": "", "score": 0}},
-    "overall_satisfaction":   {{"reason": "...", "evidence": "", "score": 0}}
-  }}
+  {
+    "linguistic_realization": {"reason": "...", "evidence": "", "score": 0},
+    "internal_consistency":   {"reason": "...", "evidence": "", "score": 0},
+    "overall_satisfaction":   {"reason": "...", "evidence": "", "score": 0}
+  }

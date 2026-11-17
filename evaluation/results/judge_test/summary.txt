@@ -1,0 +1,212 @@
+
+==================== TOP ====================
+
+--- zai-glm-5-3: 60 verdicts, 0 failed
+  linguistic_realization   mean 2.93   share of 3: 93%   dist 0/1/2/3: 0/0/4/56
+  physical_soundness       mean 1.85   share of 3: 2%   dist 0/1/2/3: 0/10/49/1
+  overall_satisfaction     mean 3.00   share of 3: 100%   dist 0/1/2/3: 0/0/0/60
+    deepseek-flash          ling 2.90  phys 2.00  over 3.00
+    gemini-3.5-flash        ling 3.00  phys 2.00  over 3.00
+    qwen3.8-27b             ling 2.90  phys 1.55  over 3.00
+    tokens per narrative: in 2523, out 366
+
+--- mistral-large-4: 21 verdicts, 1 failed
+  linguistic_realization   mean 3.00   share of 3: 100%   dist 0/1/2/3: 0/0/0/21
+  physical_soundness       mean 2.52   share of 3: 57%   dist 0/1/2/3: 0/1/8/12
+  overall_satisfaction     mean 3.00   share of 3: 100%   dist 0/1/2/3: 0/0/0/21
+    deepseek-flash          ling 3.00  phys 2.86  over 3.00
+    gemini-3.5-flash        ling 3.00  phys 2.43  over 3.00
+    qwen3.8-27b             ling 3.00  phys 2.29  over 3.00
+    tokens per narrative: in 2550, out 2927
+
+--- muse-spark-1.3: 60 verdicts, 0 failed
+  linguistic_realization   mean 2.93   share of 3: 95%   dist 0/1/2/3: 0/1/2/57
+  physical_soundness       mean 1.85   share of 3: 2%   dist 0/1/2/3: 0/10/49/1
+  overall_satisfaction     mean 3.00   share of 3: 100%   dist 0/1/2/3: 0/0/0/60
+    deepseek-flash          ling 2.95  phys 2.00  over 3.00
+    gemini-3.5-flash        ling 2.95  phys 2.00  over 3.00
+    qwen3.8-27b             ling 2.90  phys 1.55  over 3.00
+    tokens per narrative: in 2490, out 937
+
+--- agreement zai-glm-5-3 vs mistral-large-4 on 21 narratives
+  linguistic_realization   exact 86%  within 1: 100%  mean diff (zai- - mist) -0.14
+  physical_soundness       exact 24%  within 1: 95%  mean diff (zai- - mist) -0.71
+  overall_satisfaction     exact 100%  within 1: 100%  mean diff (zai- - mist) +0.00
+
+--- agreement zai-glm-5-3 vs muse-spark-1.3 on 60 narratives
+  linguistic_realization   exact 90%  within 1: 100%  mean diff (zai- - muse) +0.00
+  physical_soundness       exact 100%  within 1: 100%  mean diff (zai- - muse) +0.00
+  overall_satisfaction     exact 100%  within 1: 100%  mean diff (zai- - muse) +0.00
+
+--- agreement mistral-large-4 vs muse-spark-1.3 on 21 narratives
+  linguistic_realization   exact 90%  within 1: 95%  mean diff (mist - muse) +0.14
+  physical_soundness       exact 24%  within 1: 95%  mean diff (mist - muse) +0.71
+  overall_satisfaction     exact 100%  within 1: 100%  mean diff (mist - muse) +0.00
+
+--- scores below 2, with evidence
+  [zai-glm-] deepseek-flash-230438 phys=1: There are no physical errors, but the narrative offers essentially no physical interpretation at all: it reports values, percentiles, and contributions without ever saying what kind of jet structure the observables indic
+        evidence: The largest contribution comes from the ungroomed jet mass, at 1.4 towards qcd, on a measured value of 119.32 GeV. That mass sits low within the top-assigned jets, at a percentile of 0.35, making it extreme for that clas
+  [zai-glm-] qwen3.8-27b-134133 phys=1: The narrative reports positions and rarities but offers essentially no physical interpretation of any observable — no statement of what high mass, low D2, or low tau21 mean for jet structure, and no physical picture tyin
+        evidence: The largest contribution comes from the ungroomed jet mass, m, which adds 2.74 to the score, pushing the decision towards top. The measured mass is 170.21 GeV. This value is high, sitting in the high range of the qcd cla
+  [zai-glm-] qwen3.8-27b-208249 phys=1: The narrative reports positions and rarities but offers essentially no physical reading of any observable — nothing about prong structure, radiation patterns, or what the values imply about the jet — so the reader cannot
+        evidence: The largest contribution comes from the ungroomed jet mass, m, which adds 4.1 to the score, pushing the decision towards qcd.
+  [zai-glm-] qwen3.8-27b-230438 phys=1: The narrative reports values, positions, and rarities but offers essentially no physical interpretation of what the observables mean for this jet's structure; no prong, mass, or radiation picture is drawn, leaving the ph
+        evidence: The measured mass is 119.32 GeV. This value sits at the very bottom of the range observed for top jets, as indicated by its low position, and is extreme in its rarity, with only 0.35 percent of top jets lying further out
+  [zai-glm-] qwen3.8-27b-245194 phys=1: There are no physical errors, but there is essentially no physical interpretation at all: the narrative reports only high/low and rarity statistics per observable, never explaining what the values imply about jet structu
+        evidence: This value is low and extreme for qcd jets, with a rarity of 1.62.
+  [zai-glm-] qwen3.8-27b-262721 phys=1: The narrative reports only positional/statistical facts (high range for qcd, rarity) and never offers a physical reading of any observable — no statement about prong structure, mass topology, or what the values mean phys
+        evidence: The measured mass is 170.06 GeV. This value sits in the high range of the qcd class distribution, and is unusual for that class, with a rarity of 8.2.
+  [zai-glm-] qwen3.8-27b-290818 phys=1: The narrative reports positions within the QCD distribution and rarity, but offers essentially no physical reading of the observables — no statement of what high mass, tau32, or C2 mean for jet structure, so the reader c
+        evidence: The largest contribution comes from constituent multiplicity, n_const, which contributes -3.37 to the score, pushing the decision towards qcd. The measured value is 86.0, indicating a high number of particles in the jet.
+  [zai-glm-] qwen3.8-27b-393116 phys=1: There are no incorrect physical claims, but the narrative offers essentially no physical interpretation at all: it reports values, contributions, and rarity statistics without ever reading them in terms of jet structure 
+        evidence: The largest contribution comes from the ungroomed jet mass, m, which adds 2.46 to the score, pushing the decision towards top. The measured mass is 163.63 GeV, a value that sits in the high range of the qcd class distrib
+  [zai-glm-] qwen3.8-27b-89245 phys=1: The narrative reports values, contributions, and rarity statistics but offers essentially no physical reading of what the observables mean for this jet's structure — no mention of prong structure, mass scales, or radiati
+        evidence: The measured value is 161.79 GeV. This value sits in the high range of qcd jets, and is unusual for that class, with a rarity of 9.63.
+  [zai-glm-] qwen3.8-27b-94330 phys=1: The narrative reports positions and rarities but offers essentially no physical interpretation of any observable — no statement of what high mass, low D2, low tau32, or high multiplicity mean for the jet's structure, so 
+        evidence: The measured mass is 168.66 GeV. This value is high for qcd jets, sitting at the high end of their range, and is unusual for that class, with a rarity of 8.43.
+  [mistral-] gflash-353730 phys=1: Most physical readings are correct and consistent with the reported values (e.g., high D2 and low mass pushing towards QCD). However, the C2_double_b1 entry contains a clear internal contradiction: it states the value is
+        evidence: The third contribution comes from the energy correlation ratio C2_double_b1, contributing 2.39 towards qcd. Its measured value is 0.15. This double ratio of energy correlation functions uses up to three-point correlators
+  [muse-spa] deepseek-flash-230438 phys=1: Narrative reports only values, positions, rarity and contribution directions with no physical reading of what the observables mean for jet structure, amounting to almost no physical interpretation.
+        evidence: The largest contribution comes from the ungroomed jet mass, at 1.4 towards qcd, on a measured value of 119.32 GeV.
+  [muse-spa] qwen3.8-27b-134133 phys=1: Narrative reports positions, rarities and contribution directions but provides almost no physical interpretation of what the values mean for jet structure and no tied-together physical picture.
+        evidence: The largest contribution comes from the ungroomed jet mass, m, which adds 2.74 to the score, pushing the decision towards top.
+  [muse-spa] qwen3.8-27b-208249 ling=1: Phrases with missing quantifiers like 'higher than only low' are ungrammatical and ambiguous, requiring rereading to recover position meaning, though overall sentences are grammatical.
+        evidence: it is higher than only low of them
+  [muse-spa] qwen3.8-27b-208249 phys=1: Narrative reports only contributions, values, percentiles and rarity with direction labels, providing almost no physical interpretation of jet substructure or synthesis into a physical picture.
+        evidence: The largest contribution comes from the ungroomed jet mass, m, which adds 4.1 to the score, pushing the decision towards qcd.
+  [muse-spa] qwen3.8-27b-230438 phys=1: Narrative reports contributions and distributional positions but provides almost no physical interpretation of what the values mean for jet structure and no integrated physical picture.
+        evidence: The leading contribution comes from the ungroomed jet mass, m, which adds 1.4 to the score, pushing the decision towards qcd.
+  [muse-spa] qwen3.8-27b-245194 phys=1: Narrative reports values, contributions, and rarity but provides almost no physical interpretation of what the observables mean for jet structure, leaving the reader to assemble any picture.
+        evidence: The leading contribution comes from the ungroomed jet mass, m, which is 166.57 GeV. This value contributes 2.58 to the score, pushing towards top.
+  [muse-spa] qwen3.8-27b-262721 phys=1: Narrative reports values, positions, and contribution directions but provides almost no physical interpretation linking observables to jet structure (prongs, mass scale, radiation pattern).
+        evidence: The largest contribution comes from the ungroomed jet mass, m, which adds 2.74 to the score, pushing the decision towards top.
+  [muse-spa] qwen3.8-27b-290818 phys=1: Narrative reports contributions, values, and distributional position but provides almost no physical interpretation of jet structure to help understand the decision.
+        evidence: The largest contribution comes from constituent multiplicity, n_const, which contributes -3.37 to the score, pushing the decision towards qcd.
+  [muse-spa] qwen3.8-27b-393116 phys=1: Narrative provides contribution directions and distributional positions but offers almost no physical interpretation of what the values mean for jet structure and no integrated physical picture.
+        evidence: The largest contribution comes from the ungroomed jet mass, m, which adds 2.46 to the score, pushing the decision towards top.
+  [muse-spa] qwen3.8-27b-89245 phys=1: Narrative reports contributions, values, position and rarity but provides almost no physical interpretation of what the values mean for jet structure nor a tied-together physical picture.
+        evidence: The leading contribution comes from the ungroomed jet mass, m, which adds 2.35 to the score, pushing towards top.
+  [muse-spa] qwen3.8-27b-94330 phys=1: Narrative reports contributions, values, position and rarity but provides almost no physical interpretation of what the values mean for jet structure and no integrated physical picture.
+        evidence: The largest contribution comes from the ungroomed jet mass, m, which adds 2.67 to the score, pushing towards top.
+
+==================== AD ====================
+
+--- zai-glm-5-3: 60 verdicts, 0 failed
+  linguistic_realization   mean 2.95   share of 3: 97%   dist 0/1/2/3: 0/1/1/58
+  physical_soundness       mean 1.88   share of 3: 15%   dist 0/1/2/3: 0/16/35/9
+  overall_satisfaction     mean 2.98   share of 3: 98%   dist 0/1/2/3: 0/0/1/59
+    deepseek-flash          ling 3.00  phys 2.00  over 3.00
+    gemini-3.5-flash        ling 3.00  phys 2.00  over 3.00
+    qwen3.8-27b             ling 2.85  phys 1.65  over 2.95
+    tokens per narrative: in 2653, out 392
+
+--- mistral-large-4: 21 verdicts, 0 failed
+  linguistic_realization   mean 3.00   share of 3: 100%   dist 0/1/2/3: 0/0/0/21
+  physical_soundness       mean 2.90   share of 3: 90%   dist 0/1/2/3: 0/0/2/19
+  overall_satisfaction     mean 3.00   share of 3: 100%   dist 0/1/2/3: 0/0/0/21
+    deepseek-flash          ling 3.00  phys 3.00  over 3.00
+    gemini-3.5-flash        ling 3.00  phys 2.86  over 3.00
+    qwen3.8-27b             ling 3.00  phys 2.86  over 3.00
+    tokens per narrative: in 2699, out 1769
+
+--- muse-spark-1.3: 60 verdicts, 0 failed
+  linguistic_realization   mean 3.00   share of 3: 100%   dist 0/1/2/3: 0/0/0/60
+  physical_soundness       mean 1.70   share of 3: 3%   dist 0/1/2/3: 0/20/38/2
+  overall_satisfaction     mean 2.97   share of 3: 98%   dist 0/1/2/3: 0/1/0/59
+    deepseek-flash          ling 3.00  phys 1.55  over 3.00
+    gemini-3.5-flash        ling 3.00  phys 1.90  over 3.00
+    qwen3.8-27b             ling 3.00  phys 1.65  over 2.90
+    tokens per narrative: in 2612, out 754
+
+--- agreement zai-glm-5-3 vs mistral-large-4 on 21 narratives
+  linguistic_realization   exact 90%  within 1: 95%  mean diff (zai- - mist) -0.14
+  physical_soundness       exact 29%  within 1: 86%  mean diff (zai- - mist) -0.86
+  overall_satisfaction     exact 95%  within 1: 100%  mean diff (zai- - mist) -0.05
+
+--- agreement zai-glm-5-3 vs muse-spark-1.3 on 60 narratives
+  linguistic_realization   exact 97%  within 1: 98%  mean diff (zai- - muse) -0.05
+  physical_soundness       exact 77%  within 1: 98%  mean diff (zai- - muse) +0.18
+  overall_satisfaction     exact 98%  within 1: 100%  mean diff (zai- - muse) +0.02
+
+--- agreement mistral-large-4 vs muse-spark-1.3 on 21 narratives
+  linguistic_realization   exact 100%  within 1: 100%  mean diff (mist - muse) +0.00
+  physical_soundness       exact 14%  within 1: 90%  mean diff (mist - muse) +0.95
+  overall_satisfaction     exact 95%  within 1: 95%  mean diff (mist - muse) +0.10
+
+--- scores below 2, with evidence
+  [zai-glm-] deepseek-flash-226691 phys=1: There are no physical errors, but there is essentially no physical interpretation at all: the narrative reports values, positions, rarities, and contribution directions without ever saying what kind of jet structure the 
+        evidence: The largest contribution comes from C2_double_b1, at -0.69, pushing the jet towards the background. Its value of 0.14 is low for the background, sitting low within the reference, and with a rarity of 19.26 it is ordinary
+  [zai-glm-] deepseek-flash-269937 phys=1: There are no physical errors, but there is essentially no physical interpretation: the narrative reports values, positions, and contribution directions without ever saying what any observable means for jet structure, so 
+        evidence: No single observable stands out as decisive: every contribution is modest and every rarity is ordinary for the background.
+  [zai-glm-] deepseek-flash-324110 phys=1: The narrative reports values, positions, and contributions but offers essentially no physical reading of any observable — no statement of what high constituent multiplicity, tau32, or the correlators mean for the jet's s
+        evidence: The largest contribution comes from constituent multiplicity, whose contribution of -0.73 pushes the jet towards the background. Its value of 71.0 is high for the background reference, sitting at the upper end of the ran
+  [zai-glm-] deepseek-flash-355460 phys=1: There are no physical errors, but the narrative offers almost no physical interpretation at all: it reports values, positions, and rarities without ever saying what the observables mean for the jet's structure (e.g. noth
+        evidence: The narrative never states what any observable means physically; e.g. C2 is described only as 'its value of 0.12 pushes the jet towards the background with a contribution of -0.94 (background). That value sits low within
+  [zai-glm-] deepseek-flash-383353 phys=1: There are no physical errors, but there is essentially no physical interpretation either: the narrative reports only values, positions in the background range, and rarities, never saying what any observable means for the
+        evidence: Its value of 71.0 particles is high for the background reference, sitting at the upper end of the background's range (high), and it is 8.13 percent rarity, unusual for the background.
+  [zai-glm-] deepseek-flash-387797 phys=1: There are no physical errors, but also essentially no physical interpretation: observables are reported only as values, rarities, and push directions, with no reading of what the jet's structure is like (e.g. what a high
+        evidence: The largest contribution comes from the jet mass m, at -0.66, pushing background. Its value is 125.79 GeV, a high mass for the background, sitting high within the reference, and it is 23.18 percent, ordinary for the back
+  [zai-glm-] gflash-175477 phys=1: The leading observable's reading is physically wrong: a low N3 (e3/e2-like normalized three-point correlator) disfavors three-pronged substructure and points toward a two-prong-like jet, yet the narrative applies the thr
+        evidence: Its measured value is 1.35, which sits at the low end of the background reference distribution. This low value is unusual for the background, with a rarity of 4.11 percent, and physically points to a three-pronged substr
+  [zai-glm-] gflash-387797 phys=1: There are no physical errors, but there is essentially no physical interpretation at all: the narrative reports values, rarities, and contribution directions without ever saying what any observable means for jet structur
+        evidence: The leading contribution comes from the ungroomed jet mass m, which contributes -0.66 in the background direction. Its measured value of 125.79 GeV sits at a high level within the background reference, with a rarity of 2
+  [zai-glm-] qwen3.8-27b-113218 phys=1: No physical readings are wrong, but there is essentially no physical interpretation at all: the narrative reports only values, positions, and rarities, never saying what any value implies about jet structure (e.g. prongs
+        evidence: The largest contribution comes from constituent multiplicity, which adds 0.39 to the score, pushing the jet in the anomalous direction. The measured value is 43.0, which sits in the mid range of the background reference.
+  [zai-glm-] qwen3.8-27b-13865 phys=1: The narrative applies the low-value (two-pronged) reading directly to this jet's C2_double_b1 ('Its value is 0.31, a low value...') while simultaneously stating the value sits at the high end of the background distributi
+        evidence: Its value is 0.31, a low value for this energy correlation ratio that typically favours two-pronged structure. This value sits at the high end of the background reference distribution
+  [zai-glm-] qwen3.8-27b-269937 phys=1: No physical readings are wrong, but there is essentially no physical interpretation at all: the narrative reports only positions in the background range and rarities, never saying what the values imply about jet structur
+        evidence: The largest contribution comes from constituent multiplicity, which pushes the score in the background direction with a contribution of -0.48. The measured value is 65.0, which sits in the high region of the background r
+  [zai-glm-] qwen3.8-27b-296842 phys=1: The narrative reports positions and rarities but offers essentially no physical interpretation of what the observable values mean for the jet's structure, so the reader cannot see what kind of jet makes it look anomalous
+        evidence: The largest contribution comes from constituent multiplicity, which pushes the score in the background direction with a contribution of -0.63. The measured value is 68.0, which sits in the high region of the background r
+  [zai-glm-] qwen3.8-27b-32186 phys=1: The narrative reports positions, rarities, and contribution directions correctly but offers essentially no physical interpretation: no statement of what the observables mean for jet structure, so the reader cannot see wh
+        evidence: The largest contribution comes from constituent multiplicity, which contributes -1.0 to the score, pushing the jet in the background direction. The measured value is 80.0, which is high for the background reference, sitt
+  [zai-glm-] qwen3.8-27b-324110 phys=1: No physical reading is wrong, but there is essentially no physical interpretation at all: the narrative reports values, positions, and directions without ever saying what any observable means for jet structure, so the re
+        evidence: On this background-like jet, the contributions from constituent multiplicity, tau3/tau2, and jet mass pull the score towards the background, while the contributions from C2, C3, soft-drop mass, and D2 pull it towards the
+  [zai-glm-] qwen3.8-27b-355460 ling=1: The prose is mostly fluent, but the closing sentence is internally contradictory: it says the background-pulling contributions are 'outweighed by the smaller contributions pushing towards the anomalous side, resulting in
+        evidence: the contributions pulling the jet towards the background are outweighed by the smaller contributions pushing towards the anomalous side, resulting in a background-like decision
+  [zai-glm-] qwen3.8-27b-383353 phys=1: The narrative reports values, directions, and rarities but offers essentially no physical interpretation of what the jet's structure is; no errors, but no physical picture is built for the reader.
+        evidence: The largest contribution comes from constituent multiplicity, which pushes the score in the background direction with a contribution of -0.73.
+  [zai-glm-] qwen3.8-27b-387797 phys=1: The narrative reports values, positions, and rarities but offers essentially no physical reading of any observable (no statements about prong structure, mass, or radiation patterns), leaving the reader without a physical
+        evidence: The largest contribution comes from the jet mass, m, which contributes -0.66 to the score, pushing in the background direction. The measured value is 125.79 GeV. This value sits in the high region of the background refer
+  [muse-spa] deepseek-flash-101963 phys=1: Only jet mass receives any physical reading; all other leading observables are reported with value/position/rarity and direction only, leaving readings isolated with no tied-together physical picture of the jet.
+        evidence: The generalized correlator N3 contributes -0.32, pushing background; its value of 1.8 is mid-range, mid, and ordinary at a rarity of 45.92.
+  [muse-spa] deepseek-flash-226691 phys=1: Narrative reports positions, rarities and contribution directions but provides almost no physical interpretation of what the observables mean for jet structure and no integrated physical picture.
+        evidence: Taken together, the two largest contributions, from C2_double_b1 and the jet mass, pull this jet towards the background, and they are joined by smaller background pulls from constituent multiplicity, tau32, transverse mo
+  [muse-spa] deepseek-flash-269937 phys=1: Narrative reports positions and contributions but provides almost no physical interpretation of what the observables mean for jet structure, so no physical picture is built.
+        evidence: Next is tau32, contributing -0.28 towards the background; its value of 0.74 sits mid-range for the background (mid) and is 45.6 percent, ordinary.
+  [muse-spa] deepseek-flash-304668 phys=1: Narrative reports values, positions and contributions but provides almost no physical interpretation of what the observables mean for jet structure, with only a single generic phrase about energy deposits and no tied-tog
+        evidence: consistent with several hard, well-separated energy deposits
+  [muse-spa] deepseek-flash-324110 phys=1: Narrative reports positions, percentiles and contribution directions but provides almost no physical interpretation of what the observables mean for jet structure, so no coherent physical picture is given.
+        evidence: The largest contribution comes from constituent multiplicity, whose contribution of -0.73 pushes the jet towards the background.
+  [muse-spa] deepseek-flash-347111 phys=1: Only jet mass receives any physical reading; all other leading observables are described only by position/rarity with no correct substructure interpretation and no tied-together physical picture.
+        evidence: Next is constituent multiplicity, contributing 0.4 in the anomalous direction, with 42.0 particles; that is a mid value for the background and, at a rarity of 46.95, ordinary.
+  [muse-spa] deepseek-flash-355460 phys=1: Narrative reports only statistical position, rarity, and contribution direction with no physical reading of what the observables mean for jet structure and no tied-together physical picture.
+        evidence: The largest contribution comes from the energy correlation ratio C2, whose value of 0.12 pushes the jet towards the background with a contribution of -0.94 (background).
+  [muse-spa] deepseek-flash-383353 phys=1: Narrative reports positions, rarities and contribution directions but provides almost no physical interpretation of what the observables mean for jet structure and no integrated physical picture.
+        evidence: Its value of 71.0 particles is high for the background reference, sitting at the upper end of the background's range (high), and it is 8.13 percent rarity, unusual for the background.
+  [muse-spa] deepseek-flash-387797 phys=1: Narrative reports values, positions and contribution directions but provides almost no physical interpretation linking observables to jet structure (e.g., what mass, tau32, C2 imply).
+        evidence: No single observable stands out as decisive; the background-like verdict rests on the accumulation of several ordinary contributions rather than on any one striking value.
+  [muse-spa] gflash-101963 phys=1: Only one observable receives any physical reading, with no interpretation of substructure variables like tau32, N3, C2/D2 or multiplicity, and no tied-together physical picture of the jet is offered.
+        evidence: This high mass indicates several hard, well-separated energy deposits within the jet.
+  [muse-spa] gflash-383353 phys=1: Narrative provides almost no physical interpretation beyond naming values (e.g., counts, masses); no correct substructure readings are applied and no physical picture of the jet is assembled.
+        evidence: Its measured value of 71.0 indicates how many particles the jet contains.
+  [muse-spa] gflash-387797 phys=1: Narrative reports only position, rarity, and contribution direction with almost no physical interpretation of what the observables mean for jet structure, so no physical picture is provided.
+        evidence: Its measured value of 125.79 GeV sits at a high level within the background reference, with a rarity of 23.18 percent, making this value ordinary for the background.
+  [muse-spa] qwen3.8-27b-113218 phys=1: Narrative reports only contributions, values, positions and rarities with no physical reading of what the observables mean for jet structure, so almost no physical interpretation at all.
+        evidence: The largest contribution comes from constituent multiplicity, which adds 0.39 to the score, pushing the jet in the anomalous direction.
+  [muse-spa] qwen3.8-27b-269937 phys=1: Narrative reports values, positions, rarities and contribution directions but provides almost no physical interpretation of what the observables mean for jet structure, so no physical picture is assembled.
+        evidence: The largest contribution comes from constituent multiplicity, which pushes the score in the background direction with a contribution of -0.48.
+  [muse-spa] qwen3.8-27b-296842 phys=1: Narrative reports values, positions, rarities and contribution directions but offers almost no physical interpretation of what the observables mean for jet structure nor a tied-together physical picture.
+        evidence: The largest contribution comes from constituent multiplicity, which pushes the score in the background direction with a contribution of -0.63.
+  [muse-spa] qwen3.8-27b-32186 phys=1: Narrative reports positions, rarities and contribution directions but provides almost no physical interpretation of what the observables mean for jet structure, so no physical picture is built.
+        evidence: The largest contribution comes from constituent multiplicity, which contributes -1.0 to the score, pushing the jet in the background direction.
+  [muse-spa] qwen3.8-27b-324110 phys=1: Narrative reports only statistical position, rarity, and contribution direction with almost no physical interpretation of what the observables mean for jet structure and no tied-together physical picture.
+        evidence: The measured value is 71.0, which is high for the background reference, sitting in the high region.
+  [muse-spa] qwen3.8-27b-332818 phys=1: Only one generic physics gloss is offered for mass, with no correct substructure readings for C2, tau32, N3, D2 etc. and no tied-together physical picture, amounting to almost no physical interpretation.
+        evidence: Physically, this ungroomed mass indicates several hard, well-separated energy deposits within the jet.
+  [muse-spa] qwen3.8-27b-355460 over=1: Drivers and directions are listed in order, and band difference is flagged, but the final synthesis reverses the net balance, leaving the reader confused about why the verdict is background-like.
+        evidence: Overall, the contributions pulling the jet towards the background are outweighed by the smaller contributions pushing towards the anomalous side, resulting in a background-like decision.
+  [muse-spa] qwen3.8-27b-383353 phys=1: Narrative reports only positions, rarities and contribution directions with no physical reading of what the observables mean for jet structure, so almost no physical interpretation at all.
+        evidence: The measured value is 71.0, which is high for the background reference, sitting in the high region.
+  [muse-spa] qwen3.8-27b-387797 phys=1: Narrative reports values, positions, rarities and contribution directions but provides almost no physical interpretation of what the observables mean for jet structure, so no physical picture is built.
+        evidence: The largest contribution comes from the jet mass, m, which contributes -0.66 to the score, pushing in the background direction.

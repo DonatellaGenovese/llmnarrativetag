@@ -67,6 +67,12 @@ class ArtefactBuilder:
         g = config["abstention"]
         self.full_threshold = float(g["full_threshold"])
         self.caveat_threshold = float(g["caveat_threshold"])
+        # The rank gate (narrative/gate_top.py) when configured; the residual
+        # thresholds above otherwise (the gate of v17 and earlier).
+        self.gate = None
+        if g.get("gate"):
+            from .gate_top import TopGate
+            self.gate = TopGate(Path(__file__).resolve().parents[1] / g["gate"])
 
         if self.obs != self.stats.obs:
             raise ValueError("model and reference stats disagree on the observable basis")
@@ -80,6 +86,14 @@ class ArtefactBuilder:
         if r < self.caveat_threshold:
             return REGIME_CAVEAT
         return REGIME_ABSTAIN
+
+    def abstention_reason(self, meta: dict) -> str:
+        if self.gate is None:
+            return (f"|residual| = {abs(meta['residual']):.3f} exceeds {self.caveat_threshold}; "
+                    "the observable basis does not account for this decision closely enough to describe it")
+        return ("the surrogate takes the other decision (tagger logit "
+                f"{meta['t_raw']:.3f}, surrogate {meta['g_hat']:.3f}); the observable basis does not "
+                "account for this decision closely enough to describe it")
 
     def _terms(self, x: pd.DataFrame) -> np.ndarray:
         """Per-observable contributions, shape (n, K), unoriented."""
@@ -120,7 +134,9 @@ class ArtefactBuilder:
                 "i": f"{position:02d}",
                 "name": name,
                 "value": round(value, self.r_value),
-                "phi": round(float(phi[j]), self.r_phi),
+                # + 0.0: no "-0.0", whose sign the narrator would read while the
+                # verifier counts it as >= 0 (as in artefact_anomaly).
+                "phi": round(float(phi[j]), self.r_phi) + 0.0,
             }
             if self.include_pct:
                 pct = self.stats.obs_percentile(name, other_class, value)
@@ -149,19 +165,28 @@ class ArtefactBuilder:
             "other_class": other_class,
             "score_tagger": round(abs(t_clip), self.r_score),
             "score_pct": round(self.stats.score_percentile(decision, t_clip)),
-            "score_reconstructed": round(g * sign, self.r_score),
+            "score_reconstructed": round(g * sign, self.r_score) + 0.0,
             "recon_pct": round(self.stats.recon_percentile(residual)),
-            "intercept": round(self.intercept * sign, self.r_score),
+            "intercept": round(self.intercept * sign, self.r_score) + 0.0,
             "features": features,
         }
         # Omitted entirely when the full basis is reported: a narrator handed
         # `n_other: 0` dutifully writes a sentence about nothing.
         if len(rest):
             artefact["n_other"] = int(len(rest))
-            artefact["phi_other"] = round(float(phi[rest].sum()), self.r_phi)
+            artefact["phi_other"] = round(float(phi[rest].sum()), self.r_phi) + 0.0
+
+        if self.gate is not None:
+            place = self.gate(t, g)
+            regime = place["regime"]
+            gate_meta = {"rank_t": round(place["rank_t"], 3), "rank_g": round(place["rank_g"], 3),
+                         "rank_diff": round(place["rank_diff"], 3), "caveat_pp": self.gate.caveat_pp}
+        else:
+            regime, gate_meta = self.regime(residual), {}
 
         meta = {
-            "regime": self.regime(residual),
+            "regime": regime,
+            **gate_meta,
             "residual": round(residual, 4),
             "t_raw": round(t, 4),
             "t_clipped": bool(t != t_clip),

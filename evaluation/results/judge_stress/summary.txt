@@ -1,0 +1,36 @@
+
+=== zai-glm-5-3  (96 verdicts)
+  originals mean: ling 2.92  phys 1.75  over 2.92
+  perturbation      target  detected   drop   other   per-dim drop
+  ling_garble       ling       100%   2.00   -0.08   ling +2.00 phys -0.25 over +0.08   (n=12)
+  phys_direction    phys        33%   0.08    0.17   ling +0.33 phys +0.08 over +0.00   (n=12)
+  phys_wrong        phys        58%   0.75    0.04   ling +0.08 phys +0.75 over +0.00   (n=12)
+  phys_overreach    phys        58%   0.75   -0.04   ling +0.00 phys +0.75 over -0.08   (n=12)
+  over_nodecision   over        83%   0.83   -0.04   ling -0.08 phys +0.00 over +0.83   (n=12)
+  over_nodirection  over         8%   0.08    0.17   ling +0.33 phys +0.00 over +0.08   (n=12)
+  contradiction     -          100%                  ling +1.42 phys +0.25 over +1.17   (n=12, any dim lower)
+  detection by dimension: ling 100%  phys 50%  over 46%
+
+=== muse-spark-1.3  (96 verdicts)
+  originals mean: ling 2.75  phys 1.75  over 2.92
+  perturbation      target  detected   drop   other   per-dim drop
+  ling_garble       ling       100%   2.08    0.08   ling +2.08 phys +0.08 over +0.08   (n=12)
+  phys_direction    phys        67%   0.75    0.00   ling -0.08 phys +0.75 over +0.08   (n=12)
+  phys_wrong        phys        67%   0.75   -0.04   ling -0.17 phys +0.75 over +0.08   (n=12)
+  phys_overreach    phys        75%   0.92   -0.04   ling -0.17 phys +0.92 over +0.08   (n=12)
+  over_nodecision   over        92%   0.92   -0.12   ling -0.25 phys +0.00 over +0.92   (n=12)
+  over_nodirection  over        17%   0.25    0.00   ling +0.08 phys -0.08 over +0.25   (n=12)
+  contradiction     -          100%                  ling +0.17 phys +0.00 over +1.92   (n=12, any dim lower)
+  detection by dimension: ling 100%  phys 69%  over 54%
+
+=== mistral-large-4  (16 verdicts)
+  originals mean: ling 3.00  phys 3.00  over 3.00
+  perturbation      target  detected   drop   other   per-dim drop
+  ling_garble       ling       100%   2.50    1.25   ling +2.50 phys +1.50 over +1.00   (n=2)
+  phys_direction    phys         0%   0.00    0.00   ling +0.00 phys +0.00 over +0.00   (n=2)
+  phys_wrong        phys       100%   2.00    0.00   ling +0.00 phys +2.00 over +0.00   (n=2)
+  phys_overreach    phys       100%   3.00    0.75   ling +0.00 phys +3.00 over +1.50   (n=2)
+  over_nodecision   over         0%   0.00    0.00   ling +0.00 phys +0.00 over +0.00   (n=2)
+  over_nodirection  over         0%   0.00    0.75   ling +0.00 phys +1.50 over +0.00   (n=2)
+  contradiction     -          100%                  ling +0.00 phys +1.00 over +1.00   (n=2, any dim lower)
+  detection by dimension: ling 100%  phys 67%  over 0%
